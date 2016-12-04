@@ -7,3 +7,6 @@
 * resultados/
   * 1cpu/ - carpeta con los resultados del programa de pruebas ejecutandose en una sola cpu
   * 4cpu/ - carpeta con los resultados del programa de pruebas ejecutandose en las 4 cpus
+* transferencia.m - Script matlab para funcion de transferencia
+* governor/ - carpeta con fuentes del governor
+  * governor-sublime.c - fichero principal del governor

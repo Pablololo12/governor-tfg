@@ -41,7 +41,7 @@ done
 for freq in `cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_frequencies`
 do
 
-	for file in `ls /sys/devices/system/cpu/cpu0/cpufreq/scaling_setspeed`
+	for file in `ls /sys/devices/system/cpu/cpu*/cpufreq/scaling_setspeed`
 	do
 		echo 384000 > $file
 	done
