@@ -1,21 +1,12 @@
-dirlist = dir('/Users/Pablo/Documents/Universidad/governor-tfg/resultados/4cpu/');
-A = [];
-for i = 1:length(dirlist)
-    nombre = dirlist(i).name;
-    if strcmp(nombre,'.')==0 && strcmp(nombre,'..')==0 && strcmp(nombre,'.DS_Store')==0
-        s = strcat('/Users/Pablo/Documents/Universidad/governor-tfg/resultados/4cpu/',nombre);
-        disp(s);
-        fileID = fopen(s,'r');
-        formatSpec = '%d';
-        B = fscanf(fileID, formatSpec);
-        fclose(fileID);
-        A = [A ; B];
-    end
-end
+fileID = fopen('/Users/Pablo/Documents/Universidad/governor-tfg/resultados/state_continuous.txt','r');
+formatSpec = '%d';
+B = fscanf(fileID, formatSpec);
+fclose(fileID);
+
 Ts = 0.05; %Se toman muestras cada 3 segundos
-F = 0:size(A)-1;
-F=F';
-F(:)=1728000;
+
+A=B(1:2:end,:);
+F=B(2:2:end,:);
 
 data = iddata(A,F,Ts); %pt señal de salida (temp) %ct señal de entrada (freq) %Ts intervalo entre medidas
 data.InputName  = '\Delta Freq';
