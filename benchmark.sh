@@ -14,7 +14,7 @@ echo -e "\033[0;36m============================================================\
 exec 2>/dev/null
 
 notworking=0
-params=--num-threads=4
+params="--num-threads=4"
 dontsleep=0
 timer=600
 
@@ -26,24 +26,25 @@ echo userspace >/sys/devices/system/cpu/cpu2/cpufreq/scaling_governor
 echo userspace >/sys/devices/system/cpu/cpu3/cpufreq/scaling_governor
 echo -e "[\033[0;92mOK\033[0m]"
 
-for param in "$@"
+while [ "$#" -gt 0 ]
 do
-	if [ $param = -t ];
+	if [ "$1" = -t ];
 	then
 		notworking=1
-		params=--num-threads=1
+		params="--num-threads=1"
 		echo -n "Shutting down cores..."
 		echo 0 > /sys/devices/system/cpu/cpu1/online
 		echo 0 > /sys/devices/system/cpu/cpu2/online
 		echo 0 > /sys/devices/system/cpu/cpu3/online
 		echo -e "[\033[0;92mOK\033[0m]"
-	elif [ $param = -l ];
+	elif [ "$1" = -l ];
 	then
 		dontsleep=1
-
-	elif [ $param \> -1 -a $param \< 60000]; then
-		timer=$param
+	elif [[ "$1" =~ ^[0-9]+$ ]];
+	then
+		timer=$1
 	fi
+	shift
 done
 
 for freq in `cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_frequencies`
@@ -69,7 +70,7 @@ do
 	done
 
 	echo -n "Starting test at $freq KHz  "
-	sysbench --test=cpu --cpu-max-prime=80000 $params run >/dev/null &
+	sysbench --test=cpu --cpu-max-prime=80000 $params run >~/log.txt &
 	pid=$!
 
 	sleep $timer && kill -9 $pid &
@@ -82,6 +83,7 @@ do
 		else
 			cat /sys/class/thermal/thermal_zone0/temp >>state_continuous.txt
 			cat /sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_cur_freq >>state_continuous.txt
+		fi
 		sleep 3
 	done
 	echo -e "[\033[0;34mDONE\033[0m]"
