@@ -1,5 +1,5 @@
 /*
- *  linux/drivers/cpufreq/cpufreq_userspace.c
+ *  linux/drivers/cpufreq/cpufreq_sublime.c
  *
  *  Copyright (C)  2001 Russell King
  *            (C)  2002 - 2004 Dominik Brodowski <linux@brodo.de>
@@ -11,7 +11,7 @@
  */
 
 /* 
- * He copiado el governor Userspace que se encuentra en linux/drivers/cpufreq/cpufreq_userspace.c
+ * He copiado el governor userspace que se encuentra en linux/drivers/cpufreq/cpufreq_userspace.c
  * como una primera prueba para compilar
  */
 
@@ -57,7 +57,7 @@ static ssize_t show_speed(struct cpufreq_policy *policy, char *buf)
 	return sprintf(buf, "%u\n", policy->cur);
 }
 
-static int cpufreq_userspace_policy_init(struct cpufreq_policy *policy)
+static int cpufreq_sublime_policy_init(struct cpufreq_policy *policy)
 {
 	unsigned int *setspeed;
 
@@ -69,45 +69,45 @@ static int cpufreq_userspace_policy_init(struct cpufreq_policy *policy)
 	return 0;
 }
 
-static void cpufreq_userspace_policy_exit(struct cpufreq_policy *policy)
+static void cpufreq_sublime_policy_exit(struct cpufreq_policy *policy)
 {
-	mutex_lock(&userspace_mutex);
+	mutex_lock(&sublime_mutex);
 	kfree(policy->governor_data);
 	policy->governor_data = NULL;
-	mutex_unlock(&userspace_mutex);
+	mutex_unlock(&sublime_mutex);
 }
 
-static int cpufreq_userspace_policy_start(struct cpufreq_policy *policy)
+static int cpufreq_sublime_policy_start(struct cpufreq_policy *policy)
 {
 	unsigned int *setspeed = policy->governor_data;
 
 	BUG_ON(!policy->cur);
 	pr_debug("started managing cpu %u\n", policy->cpu);
 
-	mutex_lock(&userspace_mutex);
+	mutex_lock(&sublime_mutex);
 	per_cpu(cpu_is_managed, policy->cpu) = 1;
 	*setspeed = policy->cur;
-	mutex_unlock(&userspace_mutex);
+	mutex_unlock(&sublime_mutex);
 	return 0;
 }
 
-static void cpufreq_userspace_policy_stop(struct cpufreq_policy *policy)
+static void cpufreq_sublime_policy_stop(struct cpufreq_policy *policy)
 {
 	unsigned int *setspeed = policy->governor_data;
 
 	pr_debug("managing cpu %u stopped\n", policy->cpu);
 
-	mutex_lock(&userspace_mutex);
+	mutex_lock(&sublime_mutex);
 	per_cpu(cpu_is_managed, policy->cpu) = 0;
 	*setspeed = 0;
-	mutex_unlock(&userspace_mutex);
+	mutex_unlock(&sublime_mutex);
 }
 
-static void cpufreq_userspace_policy_limits(struct cpufreq_policy *policy)
+static void cpufreq_sublime_policy_limits(struct cpufreq_policy *policy)
 {
 	unsigned int *setspeed = policy->governor_data;
 
-	mutex_lock(&userspace_mutex);
+	mutex_lock(&sublime_mutex);
 
 	pr_debug("limit event for cpu %u: %u - %u kHz, currently %u kHz, last set to %u kHz\n",
 		 policy->cpu, policy->min, policy->max, policy->cur, *setspeed);
@@ -119,43 +119,43 @@ static void cpufreq_userspace_policy_limits(struct cpufreq_policy *policy)
 	else
 		__cpufreq_driver_target(policy, *setspeed, CPUFREQ_RELATION_L);
 
-	mutex_unlock(&userspace_mutex);
+	mutex_unlock(&sublime_mutex);
 }
 
-static struct cpufreq_governor cpufreq_gov_userspace = {
+static struct cpufreq_governor cpufreq_gov_sublime = {
 	.name		= "sublime",
-	.init		= cpufreq_userspace_policy_init,
-	.exit		= cpufreq_userspace_policy_exit,
-	.start		= cpufreq_userspace_policy_start,
-	.stop		= cpufreq_userspace_policy_stop,
-	.limits		= cpufreq_userspace_policy_limits,
+	.init		= cpufreq_sublime_policy_init,
+	.exit		= cpufreq_sublime_policy_exit,
+	.start		= cpufreq_sublime_policy_start,
+	.stop		= cpufreq_sublime_policy_stop,
+	.limits		= cpufreq_sublime_policy_limits,
 	.store_setspeed	= cpufreq_set,
 	.show_setspeed	= show_speed,
 	.owner		= THIS_MODULE,
 };
 
-static int __init cpufreq_gov_userspace_init(void)
+static int __init cpufreq_gov_sublime_init(void)
 {
-	return cpufreq_register_governor(&cpufreq_gov_userspace);
+	return cpufreq_register_governor(&cpufreq_gov_sublime);
 }
 
-static void __exit cpufreq_gov_userspace_exit(void)
+static void __exit cpufreq_gov_sublime_exit(void)
 {
-	cpufreq_unregister_governor(&cpufreq_gov_userspace);
+	cpufreq_unregister_governor(&cpufreq_gov_sublime);
 }
 
 MODULE_AUTHOR("Pablo");
-MODULE_DESCRIPTION("CPUfreq policy governor 'userspace'");
+MODULE_DESCRIPTION("CPUfreq policy governor 'sublime'");
 MODULE_LICENSE("GPL");
 
-#ifdef CONFIG_CPU_FREQ_DEFAULT_GOV_USERSPACE
+#ifdef CONFIG_CPU_FREQ_DEFAULT_GOV_sublime
 struct cpufreq_governor *cpufreq_default_governor(void)
 {
-	return &cpufreq_gov_userspace;
+	return &cpufreq_gov_sublime;
 }
 
-fs_initcall(cpufreq_gov_userspace_init);
+fs_initcall(cpufreq_gov_sublime_init);
 #else
-module_init(cpufreq_gov_userspace_init);
+module_init(cpufreq_gov_sublime_init);
 #endif
-module_exit(cpufreq_gov_userspace_exit);
+module_exit(cpufreq_gov_sublime_exit);

@@ -14,7 +14,9 @@ echo -e "\033[0;36m============================================================\
 exec 2>/dev/null
 
 notworking=0
-params=--num-threads=4
+params="--num-threads=4"
+dontsleep=0
+timer=600
 
 
 echo -n "Setting Governor to userspace..."
@@ -24,34 +26,43 @@ echo userspace >/sys/devices/system/cpu/cpu2/cpufreq/scaling_governor
 echo userspace >/sys/devices/system/cpu/cpu3/cpufreq/scaling_governor
 echo -e "[\033[0;92mOK\033[0m]"
 
-for param in "$*"
+while [ "$#" -gt 0 ]
 do
-	if [ $param = -t ];
+	if [ "$1" = -t ];
 	then
 		notworking=1
-		params=--num-threads=1
+		params="--num-threads=1"
 		echo -n "Shutting down cores..."
 		echo 0 > /sys/devices/system/cpu/cpu1/online
 		echo 0 > /sys/devices/system/cpu/cpu2/online
 		echo 0 > /sys/devices/system/cpu/cpu3/online
 		echo -e "[\033[0;92mOK\033[0m]"
+	elif [ "$1" = -l ];
+	then
+		dontsleep=1
+	elif [[ "$1" =~ ^[0-9]+$ ]];
+	then
+		timer=$1
 	fi
+	shift
 done
 
 for freq in `cat /sys/devices/system/cpu/cpu0/cpufreq/scaling_available_frequencies`
 do
 
-	for file in `ls /sys/devices/system/cpu/cpu0/cpufreq/scaling_setspeed`
+	for file in `ls /sys/devices/system/cpu/cpu*/cpufreq/scaling_setspeed`
 	do
 		echo 384000 > $file
 	done
 
-	echo -n "Cooling Down  "
-	while [ $(cat /sys/class/thermal/thermal_zone0/temp) -gt 47 ];
-	do
-		sleep 10
-	done
-	echo -e "[\033[0;34mDONE\033[0m]"
+	if [ $dontsleep = 0 ]; then
+		echo -n "Cooling Down  "
+		while [ $(cat /sys/class/thermal/thermal_zone0/temp) -gt 47 ];
+		do
+			sleep 10
+		done
+		echo -e "[\033[0;34mDONE\033[0m]"
+	fi
 
 	for file in `ls /sys/devices/system/cpu/cpu0/cpufreq/scaling_setspeed`
 	do
@@ -59,14 +70,20 @@ do
 	done
 
 	echo -n "Starting test at $freq KHz  "
-	sysbench --test=cpu --cpu-max-prime=80000 $params run >/dev/null &
+	sysbench --test=cpu --cpu-max-prime=80000 $params run >~/log.txt &
 	pid=$!
 
-	sleep 600 && kill -9 $pid &
+	sleep $timer && kill -9 $pid &
 
 	while kill -0 $pid 2>/dev/null;
 	do
-		cat /sys/class/thermal/thermal_zone0/temp >>estado_"$freq".txt
+		if [ dontsleep = 0 ]; then
+			cat /sys/class/thermal/thermal_zone0/temp >>state_"$freq".txt
+			cat /sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_cur_freq >>state_"$freq".txt
+		else
+			cat /sys/class/thermal/thermal_zone0/temp >>state_continuous.txt
+			cat /sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_cur_freq >>state_continuous.txt
+		fi
 		sleep 3
 	done
 	echo -e "[\033[0;34mDONE\033[0m]"
