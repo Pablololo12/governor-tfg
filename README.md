@@ -2,11 +2,8 @@
 
 ## Ficheros
 
-* benchmark.sh - sript bash que ejecuta programas de pruebas para calentar la cpu
-* grafica.py - script de python para mostrar la gráfica de temperatura
-* resultados/
-  * 1cpu/ - carpeta con los resultados del programa de pruebas ejecutandose en una sola cpu
-  * 4cpu/ - carpeta con los resultados del programa de pruebas ejecutandose en las 4 cpus
-* transferencia.m - Script matlab para funcion de transferencia
+* benchmark/ - Carpeta con el programa y script usados para calentar el procesador
+* results/ - Carpeta con los resultados del calentamiento
 * governor/ - carpeta con fuentes del governor
   * governor-sublime.c - fichero principal del governor
+* Matlab_files/ - Carpeta con los programas de Matlab de analisis
