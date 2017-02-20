@@ -1,0 +1,9 @@
+Para actualizar la placa he ido a:
+"https://releases.linaro.org/debian/boards/snapdragon/latest/"
+
+He descargado:
+linaro-jessie-alip-qcom-snapdragon-20160224-38.img
+linaro-jessie-developer-qcom-snapdragon-20160224-38.img
+boot-qcom-apq8064-ifc6410-qcom-snapdragon-20160224-38.img
+firmware-qcom-snapdragon-20160224-38.img
+
