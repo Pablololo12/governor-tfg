@@ -6,7 +6,7 @@ CFLAGS=-std=c++11 -O3 -Wall
 
 LFLAGS=-I/home/linaro/gcc-4.8/include -L/home/linaro/gcc-4.8/lib
 
-LIBS=-lm -lQSML-sequential
+LIBS=-lm -lQSML
 
 all:
-	$(CC) $(LFLAGS) $(CFLAGS) -o benchmark main.c
+	$(CC) $(LFLAGS) $(CFLAGS) -o benchmark main.c $(LIBS)

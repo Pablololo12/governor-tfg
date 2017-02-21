@@ -1,13 +1,16 @@
-fileID = fopen('resultados/Nuevo_Benchmark/1CPU/state_continuous.txt','r');
+fileID = fopen('../results/Nuevo_Benchmark/1CPU/state_continuous.txt','r');
 %fileID = fopen('resultados/state_continuous.txt','r');
 formatSpec = '%d';
 B = fscanf(fileID, formatSpec);
 fclose(fileID);
 
-Ts = 0.05; %Se toman muestras cada 3 segundos
+Ts = 3; %Se toman muestras cada 3 segundos
 
 A=B(1:2:end,:);
 F=B(2:2:end,:);
+
+%Para pasar a grados
+A = rdivide(A,1000);
 
 data = iddata(A,F,Ts); %pt señal de salida (temp) %ct señal de entrada (freq) %Ts intervalo entre medidas
 data.InputName  = '\Delta Freq';
@@ -152,11 +155,11 @@ sysP1D_noise.NoiseTF;
 % Create a 'P1D' model with these values and see how well that model
 % fits the measured data.
 
-%sysReal = idproc('P1D','TimeUnit','minutes');
-%sysReal.Kp  = 1-pi/100;
-%sysReal.Td  = 15/60;
-%sysReal.Tp1 = 21.3/60;
-%sysReal.NoiseTF = struct('num',{[1 10000]},'den',{[1 0.04]});
+sysReal = idproc('P1D','TimeUnit','minutes');
+sysReal.Kp  = 1-pi/100;
+sysReal.Td  = 15/60;
+sysReal.Tp1 = 21.3/60;
+sysReal.NoiseTF = struct('num',{[1 10000]},'den',{[1 0.04]});
 %%
 %
-%compare(data,sysReal,sysTF,sysTF_initialized,sysP1D,sysP1D_noise);
+compare(data,sysReal,sysTF,sysTF_initialized,sysP1D,sysP1D_noise);
