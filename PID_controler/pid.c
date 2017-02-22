@@ -60,5 +60,6 @@ int update_temp(int error)
 
 int main(int argc, char ** argv)
 {
+	printf("%d\n", which_freq(918001));
 	return 0;
 }

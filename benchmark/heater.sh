@@ -64,7 +64,7 @@ do
 		echo -e "[\033[0;34mDONE\033[0m]"
 	fi
 
-	for file in `ls /sys/devices/system/cpu/cpu0/cpufreq/scaling_setspeed`
+	for file in `ls /sys/devices/system/cpu/cpu*/cpufreq/scaling_setspeed`
 	do
 		echo $freq > $file
 	done
