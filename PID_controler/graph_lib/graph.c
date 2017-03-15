@@ -12,7 +12,6 @@ static WINDOW * mainwin;
 int print_graph(int * values, unsigned int size)
 {
 	int max_value=0;
-	int prev;
 	int i,d;
 	int x,y,aux;
 	int proportion_y = 1, proportion_x = 1;
@@ -65,15 +64,11 @@ int print_graph(int * values, unsigned int size)
 
 	// Set color to red
 	color_set(1, NULL);
-	prev = values[0]/proportion_y;
 	
 	// Loop to print the graph
 	for(i=0, d=0; d<size; i++, d+=proportion_x) {
 		aux = values[d]/proportion_y;
-		if (prev<aux) mvaddstr(y-aux-2, i + 4, "/");
-		else if (prev>aux) mvaddstr(y-aux-2, i + 4, "\\");
-		else mvaddstr(y-aux-2, i + 4, "-");
-		prev = aux;
+		mvaddstr(y-aux-2, i + 4, "~");
 	}
 
 	refresh();
@@ -107,5 +102,21 @@ int destroy()
 	endwin();
 	refresh();
 
+	return 0;
+}
+
+int main()
+{
+	int matrix[1024];
+	int siz = 0;
+	initialize();
+	int i;
+	for (i=0; i<1024; i++) {
+		matrix[i] = i;
+		siz++;
+		print_graph(matrix, siz);
+		sleep(1);
+	}
+	destroy();
 	return 0;
 }
