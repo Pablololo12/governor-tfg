@@ -1,0 +1,231 @@
+>> transferencia2
+Warning: For transient data (step or impulse experiment), make sure that the change in input signal does not happen too
+early relative to the order of the desired model. You can achieve this by prepending sufficient number of zeros
+(equilibrium values) to the input and output signals. For example, a step input must be represented as [zeros(nx,1);
+ones(N,1)] rather than ones(N,1), such that nx > model order. 
+> In idpack.utValidateEstimationData (line 102)
+  In idpack.utPrepareEstimationOptions (line 62)
+  In tfest>localValidateInputs (line 310)
+  In tfest (line 100)
+  In transferencia2 (line 24) 
+
+sysTF =
+ 
+  From input "\Delta CTemp" to output "\Delta PTemp":
+    142.3
+  ---------
+  s + 502.1
+ 
+Continuous-time identified transfer function.
+
+Parameterization:
+   Number of poles: 1   Number of zeros: 0
+   Number of free coefficients: 2
+   Use "tfdata", "getpvec", "getcov" for parameters and their uncertainties.
+
+Status:                                           
+Estimated using TFEST on time domain data "data". 
+Fit to estimation data: 0.1337% (simulation focus)
+FPE: 1.819e+11, MSE: 1.791e+11                    
+>> clear
+>> transferencia
+Warning: For transient data (step or impulse experiment), make sure that the change in input signal does not happen too
+early relative to the order of the desired model. You can achieve this by prepending sufficient number of zeros
+(equilibrium values) to the input and output signals. For example, a step input must be represented as [zeros(nx,1);
+ones(N,1)] rather than ones(N,1), such that nx > model order. 
+> In idpack.utValidateEstimationData (line 102)
+  In idpack.utPrepareEstimationOptions (line 62)
+  In tfest>localValidateInputs (line 310)
+  In tfest (line 100)
+  In transferencia (line 30) 
+Warning: For transient data (step or impulse experiment), make sure that the change in input signal does not happen too
+early relative to the order of the desired model. You can achieve this by prepending sufficient number of zeros
+(equilibrium values) to the input and output signals. For example, a step input must be represented as [zeros(nx,1);
+ones(N,1)] rather than ones(N,1), such that nx > model order. 
+> In idpack.utValidateEstimationData (line 102)
+  In idpack.utPrepareEstimationOptions (line 62)
+  In tfest>localValidateInputs (line 310)
+  In tfest (line 100)
+  In transferencia (line 74) 
+
+sysTF_initialized =
+ 
+  From input "\Delta Freq" to output "\Delta PTemp":
+   2.951e-06
+  -----------
+  s + 0.03693
+ 
+Continuous-time identified transfer function.
+
+Parameterization:
+   Number of poles: 1   Number of zeros: 0
+   Number of free coefficients: 2
+   Use "tfdata", "getpvec", "getcov" for parameters and their uncertainties.
+
+Status:                                          
+Estimated using TFEST on time domain data "data".
+Fit to estimation data: 32.35% (simulation focus)
+FPE: 35.12, MSE: 34.06                           
+Warning: For transient data (step or impulse experiment), make sure that the change in input signal does not happen too
+early relative to the order of the desired model. You can achieve this by prepending sufficient number of zeros
+(equilibrium values) to the input and output signals. For example, a step input must be represented as [zeros(nx,1);
+ones(N,1)] rather than ones(N,1), such that nx > model order. 
+> In idpack.utValidateEstimationData (line 102)
+  In idpack.utPrepareEstimationOptions (line 62)
+  In procest>localValidateInputs (line 221)
+  In procest (line 89)
+  In transferencia (line 93) 
+
+sysP1D =
+Process model with transfer function:
+             Kp                      
+  G(s) = ---------- * exp(-Td*s)     
+          1+Tp1*s                    
+                                     
+        Kp = 8.6594e-05              
+       Tp1 = 160.51                  
+        Td = 0.498                   
+                                     
+Parameterization:
+    'P1D'
+   Number of free coefficients: 3
+   Use "getpvec", "getcov" for parameters and their uncertainties.
+
+Status:                                            
+Estimated using PROCEST on time domain data "data".
+Fit to estimation data: 92.52%                     
+FPE: 0.4339, MSE: 0.4166                           
+Warning: For transient data (step or impulse experiment), make sure that the change in input signal does not happen too
+early relative to the order of the desired model. You can achieve this by prepending sufficient number of zeros
+(equilibrium values) to the input and output signals. For example, a step input must be represented as [zeros(nx,1);
+ones(N,1)] rather than ones(N,1), such that nx > model order. 
+> In idpack.utValidateEstimationData (line 102)
+  In idpack.utPrepareEstimationOptions (line 62)
+  In procest>localValidateInputs (line 221)
+  In procest (line 89)
+  In transferencia (line 129) 
+>> transferencia
+
+sysTF_initialized =
+ 
+  From input "\Delta Freq" to output "\Delta PTemp":
+  7.609e-05
+  ---------
+  s + 0.662
+ 
+Continuous-time identified transfer function.
+
+Parameterization:
+   Number of poles: 1   Number of zeros: 0
+   Number of free coefficients: 2
+   Use "tfdata", "getpvec", "getcov" for parameters and their uncertainties.
+
+Status:                                           
+Estimated using TFEST on time domain data "data". 
+Fit to estimation data: -85.03% (simulation focus)
+FPE: 223.8, MSE: 222.6                            
+
+sysP1D =
+Process model with transfer function:
+             Kp                      
+  G(s) = ---------- * exp(-Td*s)     
+          1+Tp1*s                    
+                                     
+        Kp = 0.00011489              
+       Tp1 = 1e-06                   
+        Td = 0                       
+                                     
+Parameterization:
+    'P1D'
+   Number of free coefficients: 3
+   Use "getpvec", "getcov" for parameters and their uncertainties.
+
+Status:                                            
+Estimated using PROCEST on time domain data "data".
+Fit to estimation data: -85.86%                    
+FPE: 225.7, MSE: 224.6                             
+>> plot(data)
+>> transferencia
+
+sysTF_initialized =
+ 
+  From input "\Delta Freq" to output "\Delta PTemp":
+  7.609e-05
+  ---------
+  s + 0.662
+ 
+Continuous-time identified transfer function.
+
+Parameterization:
+   Number of poles: 1   Number of zeros: 0
+   Number of free coefficients: 2
+   Use "tfdata", "getpvec", "getcov" for parameters and their uncertainties.
+
+Status:                                           
+Estimated using TFEST on time domain data "data". 
+Fit to estimation data: -85.03% (simulation focus)
+FPE: 223.8, MSE: 222.6                            
+
+sysP1D =
+Process model with transfer function:
+             Kp                      
+  G(s) = ---------- * exp(-Td*s)     
+          1+Tp1*s                    
+                                     
+        Kp = 0.00011489              
+       Tp1 = 1e-06                   
+        Td = 0                       
+                                     
+Parameterization:
+    'P1D'
+   Number of free coefficients: 3
+   Use "getpvec", "getcov" for parameters and their uncertainties.
+
+Status:                                            
+Estimated using PROCEST on time domain data "data".
+Fit to estimation data: -85.86%                    
+FPE: 225.7, MSE: 224.6                             
+>> sysReal
+
+sysReal =
+Process model with transfer function:                     
+             Kp                                           
+  G(s) = ---------- * exp(-Td*s)                          
+          1+Tp1*s                                         
+                                                          
+        Kp = 0.96858                                      
+       Tp1 = 0.355                                        
+        Td = 0.25                                         
+                                                          
+  An additive ARMA disturbance model exists for this model
+      y = G u + (C/D)e                                    
+                                                          
+      C(s) = s + 10000                                    
+      D(s) = s + 0.04                                     
+                                                          
+Parameterization:
+    'P1D'
+   Number of free coefficients: 5
+   Use "getpvec", "getcov" for parameters and their uncertainties.
+
+Status:                                                         
+Created by direct construction or transformation. Not estimated.
+>> s = tf('s');
+>> G = 0.97/(1+0.35*s)*exp(-0.25*s)
+
+G =
+ 
+                    0.97
+  exp(-0.25*s) * ----------
+                 0.35 s + 1
+ 
+Continuous-time transfer function.
+
+>> step(G)
+>> C = 0.5*(s+0.25)/s;
+>> step(feedback(C*G,1))
+>> step(G)
+>> C = 1.5*(s+2.5)/s;
+>> step(feedback(C*G,1))
+>> sisotool(G)
+>> 

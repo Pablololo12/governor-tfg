@@ -1,4 +1,4 @@
-fileID = fopen('../results/Nuevo_Benchmark/1CPU/state_continuous.txt','r');
+fileID = fopen('/Users/Pablo/Documents/Universidad/governor-tfg/results/Nuevo_Benchmark/1CPU/state_continuous.txt','r');
 %fileID = fopen('resultados/state_continuous.txt','r');
 formatSpec = '%d';
 B = fscanf(fileID, formatSpec);
@@ -17,7 +17,7 @@ data.InputName  = '\Delta Freq';
 data.InputUnit  = 'KHz';
 data.OutputName = '\Delta PTemp';
 data.OutputUnit = 'C';
-data.TimeUnit   = 'minutes';
+data.TimeUnit   = 'seconds';
 plot(data)
 
 
@@ -154,12 +154,12 @@ sysP1D_noise.NoiseTF;
 %
 % Create a 'P1D' model with these values and see how well that model
 % fits the measured data.
-
-sysReal = idproc('P1D','TimeUnit','minutes');
-sysReal.Kp  = 1-pi/100;
-sysReal.Td  = 15/60;
-sysReal.Tp1 = 21.3/60;
-sysReal.NoiseTF = struct('num',{[1 10000]},'den',{[1 0.04]});
+% 
+% sysReal = idproc('P1D','TimeUnit','minutes');
+% sysReal.Kp  = 1-pi/100;
+% sysReal.Td  = 15/60;
+% sysReal.Tp1 = 21.3/60;
+% sysReal.NoiseTF = struct('num',{[1 10000]},'den',{[1 0.04]});
 %%
 %
-compare(data,sysReal,sysTF,sysTF_initialized,sysP1D,sysP1D_noise);
+%compare(data,sysReal,sysTF,sysTF_initialized,sysP1D,sysP1D_noise);

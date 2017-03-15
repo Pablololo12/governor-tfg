@@ -1,20 +1,20 @@
 #include "pid.h"
-
-#define NUM_FREQ 6
-
-// Constants for the formula
-const int E = 1;
-const int A = 1;
-const int B = 1;
-const int C = 1;
+#include <stdio.h>
 
 // Global variables
-int previous_temp = 0;
-int error_minus1 = 0;
-int error_minus2 = 0;
+static int previous_temp = 0;
+static int error_minus1 = 0;
+static int error_minus2 = 0;
+
+// Constants for the formula
+static int E = 0;
+static int A = 918+10000/25000;
+static int B = 0;
+static int C = 0;
 
 // Working frequencies
-unsigned int posible_freq[NUM_FREQ] = {384000, 486000, 594000, 702000, 810000, 918000};
+static int NUM_FREQ = 0;
+static unsigned int posible_freq[30];
 
 /*
  * Choose the correct frequency
@@ -22,19 +22,15 @@ unsigned int posible_freq[NUM_FREQ] = {384000, 486000, 594000, 702000, 810000, 9
 unsigned int which_freq(unsigned int freq)
 {
 	int i;
-	if(freq < posible_freq[0])
-	{
+	if(freq < posible_freq[0]) {
 		return posible_freq[0];
 	}
 
-	for(i=1; i<NUM_FREQ; i++)
-	{
-		if(freq < posible_freq[i])
-		{
+	for (i=1; i<NUM_FREQ; i++) {
+		if (freq < posible_freq[i]) {
 			unsigned int mean = (posible_freq[i] + posible_freq[i-1]) >> 1;
 			
-			if(freq < mean)
-			{
+			if (freq < mean) {
 				return posible_freq[i-1];
 			} else {
 				return posible_freq[i];
@@ -48,18 +44,53 @@ unsigned int which_freq(unsigned int freq)
 /*
  * Return the temperature
  */
-int update_temp(int error)
+unsigned int update_temp(int error)
 {
 	int acum = E * previous_temp + A * error + B * error_minus1 + C * error_minus2;
 	previous_temp = acum;
 	error_minus2 = error_minus1;
 	error_minus1 = error;
 
-	return acum;
+	return which_freq(acum);
 }
 
-int main(int argc, char ** argv)
+/*
+ * Initialize variables for PID and frequencies
+ */
+int initialize()
 {
-	printf("%d\n", which_freq(918001));
+	FILE *fp_const;
+	FILE *fp_freq;
+
+	fp_const = fopen(CONST_FILE, "r");
+
+	if(fp_const==NULL) {
+		fprintf(stderr, "Error openning CONST_FILE\n");
+		return -1;
+	}
+
+	fscanf(fp_const, "%d %d %d %d", &E, &A, &B, &C);
+
+	fclose(fp_const);
+
+	fp_freq = fopen(FREQ_FILE, "r");
+
+	if(fp_freq==NULL) {
+		fprintf(stderr, "Error openning CONST_FILE\n");
+		return -1;
+	}
+
+	while(!feof(fp_freq)) {
+		fscanf(fp_freq, "%d", &posible_freq[NUM_FREQ++]);
+	}
+
+	fclose(fp_const);
+
+	return 1;
+}
+
+int main()
+{
+	initialize();
 	return 0;
 }
