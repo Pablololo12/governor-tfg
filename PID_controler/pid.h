@@ -11,6 +11,6 @@ unsigned int which_freq(unsigned int);
 unsigned int update_temp(int);
 
 // initialize the constants for the formula
-int initialize();
+int initialize_pid();
 
 #endif

@@ -4,5 +4,19 @@ CC=gcc
 
 CFLAGS=-std=c11 -O3 -Wall
 
-all:
-	$(CC) $(CFLAGS) -o pid pid.c
+LIBS=-lncurses
+
+SRC=pid.h pid.c graph_lib/graph.c graph_lib/graph.h
+OBJ=pid.o graph.o
+
+all: pid.o graph.o
+	$(CC) $(CFLAGS) $(LIBS) -o user_governor user_governor.c $(OBJ)
+
+pid.o: pid.c
+	$(CC) $(CFLAGS) -c pid.c
+
+graph.o: graph_lib/graph.c
+	$(CC) $(CFLAGS) $(LIBS) -c graph_lib/graph.c
+
+clean:
+	$(RM) $(OBJ) user_governor

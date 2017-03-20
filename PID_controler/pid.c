@@ -57,7 +57,7 @@ unsigned int update_temp(int error)
 /*
  * Initialize variables for PID and frequencies
  */
-int initialize()
+int initialize_pid()
 {
 	FILE *fp_const;
 	FILE *fp_freq;
@@ -87,10 +87,4 @@ int initialize()
 	fclose(fp_const);
 
 	return 1;
-}
-
-int main()
-{
-	initialize();
-	return 0;
 }

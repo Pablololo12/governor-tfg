@@ -3,7 +3,7 @@
 
 // Function that initialize the window
 // You must call this function allways
-int initialize();
+int initialize_win();
 
 // Function to delete the windows
 int destroy();

@@ -76,7 +76,10 @@ int print_graph(int * values, unsigned int size)
 	return 0;
 }
 
-int initialize()
+/*
+ * Initialize the screen
+ */
+int initialize_win()
 {
 	if ( (mainwin = initscr()) == NULL ) {
 		fprintf(stderr, "Error initialising ncurses.\n");
@@ -96,6 +99,9 @@ int initialize()
 	return 1;
 }
 
+/*
+ * Call to erase screen
+ */
 int destroy()
 {
 	delwin(mainwin);
@@ -104,7 +110,7 @@ int destroy()
 
 	return 0;
 }
-
+/*
 int main()
 {
 	int matrix[1024];
@@ -119,4 +125,4 @@ int main()
 	}
 	destroy();
 	return 0;
-}
+}*/
