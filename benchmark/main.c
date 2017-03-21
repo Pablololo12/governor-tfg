@@ -7,14 +7,15 @@ enum {
   ROWS = 8192,
   COLUMNS = 8192};
 
-static const double FLOP = 134225920.0;
-
-
 /*
  * In order to calculate the product of these two matrix you need
  * 8192 products and 8193 adds per element
  * (8192 + 8193) * 8192 = 134.225.920 floating point operations
+ * But we do the test 10 times
  */
+
+static const double FLOP = 1342259200.0;
+
 
 int main(int argc, char **argv)
 {
@@ -34,11 +35,12 @@ int main(int argc, char **argv)
 	printf("Starting test...");
 	clock_t begin = clock();
 	//while (1==1) {
-	cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, ROWS, COLUMNS, COLUMNS, 1.0, A, ROWS, B, ROWS, 0.0, C, ROWS);
-	//	float *aux=C;
-	//	C=A;
-	//	A=aux;
-	//}
+	for (int i=0; i<=10; i++) {
+		cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, ROWS, COLUMNS, COLUMNS, 1.0, A, ROWS, B, ROWS, 0.0, C, ROWS);
+		float *aux=C;
+		C=A;
+		A=aux;
+	}
 	clock_t end = clock();
 	double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
 
