@@ -24,12 +24,14 @@ int main(int argc, char **argv)
 	float *B = new float[matrixSize];
 	float *C = new float[matrixSize];
 
+	printf("Filling matrix\n");
 	for (uint32_t i=0; i<matrixSize;i++) {
 		A[i]=(float)rand()/(float)(RAND_MAX/1000);
 		B[i]=(float)rand()/(float)(RAND_MAX/1000);
 	}
 
 
+	printf("Starting test...");
 	clock_t begin = clock();
 	//while (1==1) {
 	cblas_sgemm(CblasRowMajor, CblasNoTrans, CblasNoTrans, ROWS, COLUMNS, COLUMNS, 1.0, A, ROWS, B, ROWS, 0.0, C, ROWS);
