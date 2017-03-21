@@ -11,10 +11,10 @@ enum {
  * In order to calculate the product of these two matrix you need
  * 8192 products and 8193 adds per element
  * (8192 + 8193) * 8192 = 134.225.920 floating point operations
- * But we do the test 10 times
+ * But we do the test 5 times
  */
 
-static const double FLOP = 1342259200.0;
+static const double FLOP = 671129600.0671129600.0671129600.0671129600.0671129600.0671129600.0;
 
 
 int main(int argc, char **argv)
