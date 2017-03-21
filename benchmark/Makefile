@@ -2,7 +2,12 @@
 
 CC=g++
 
-CFLAGS=-std=c++11 -O3 -Wall
+WARNINGS=-Wall -Wextra -pedantic -Wshadow -Wpointer-arith -Wcast-align \
+         -Wwrite-strings -Wmissing-declarations \
+         -Wredundant-decls  -Winline -Wno-long-long \
+         -Wuninitialized -Wconversion
+
+CFLAGS=-std=c++11 -O3 $(WARNINGS)
 
 LFLAGS=-I/home/linaro/gcc-4.8/include -L/home/linaro/gcc-4.8/lib
 

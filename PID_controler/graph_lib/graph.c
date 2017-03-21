@@ -9,7 +9,7 @@ static WINDOW * mainwin;
 /*
  * Draw a graph given an array of values
  */
-int print_graph(int * values, unsigned int size)
+int print_graph(int * values, int size)
 {
 	int max_value=0;
 	int i,d;

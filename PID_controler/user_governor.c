@@ -20,10 +20,13 @@ static FILE *cpu_1;
 static FILE *cpu_2;
 static FILE *cpu_3;
 
+// Declaration of the function
+int open_files(void);
+
 /*
  * Function to open the temperature file and the freq files
  */
-int open_files()
+int open_files(void)
 {
 	temp = fopen(FILE_TEMP, "r");
 	if (temp == NULL) {
@@ -57,13 +60,13 @@ int open_files()
 	return 1;
 }
 
-int main()
+int main(void)
 {
-	unsigned int size=200;
-	int *temp_historic = malloc(size*sizeof(int));
-	unsigned int number_elements=0;
+	int size=200;
+	int *temp_historic = malloc((unsigned long)(size*(int)(sizeof(int))));
+	int number_elements=0;
 	int aux = 0;
-	unsigned int new_freq = 0;
+	int new_freq = 0;
 
 	// initialize the PID controller
 	if (initialize_pid()==-1) {
@@ -89,7 +92,7 @@ int main()
 		// If the array is full more space is added
 		if(number_elements == size) {
 			size += 200;
-			temp_historic = realloc(temp_historic, size * sizeof(int));
+			temp_historic = realloc(temp_historic, (unsigned long)(size * (int)(sizeof(int))));
 		}
 
 		// Print the new graph

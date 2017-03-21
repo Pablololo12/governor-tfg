@@ -3,12 +3,12 @@
 
 // Function that initialize the window
 // You must call this function allways
-int initialize_win();
+int initialize_win(void);
 
 // Function to delete the windows
-int destroy();
+int destroy(void);
 
 // Function to update the windows
-int print_graph(int * , unsigned int);
+int print_graph(int * values, int size);
 
 #endif

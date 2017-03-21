@@ -14,12 +14,12 @@ static int C = 0;
 
 // Working frequencies
 static int NUM_FREQ = 0;
-static unsigned int posible_freq[30];
+static int posible_freq[30];
 
 /*
  * Choose the correct frequency
  */
-unsigned int which_freq(unsigned int freq)
+int which_freq(int freq)
 {
 	int i;
 	if(freq < posible_freq[0]) {
@@ -28,7 +28,7 @@ unsigned int which_freq(unsigned int freq)
 
 	for (i=1; i<NUM_FREQ; i++) {
 		if (freq < posible_freq[i]) {
-			unsigned int mean = (posible_freq[i] + posible_freq[i-1]) >> 1;
+			int mean = (posible_freq[i] + posible_freq[i-1]) >> 1;
 			
 			if (freq < mean) {
 				return posible_freq[i-1];
@@ -44,7 +44,7 @@ unsigned int which_freq(unsigned int freq)
 /*
  * Return the temperature
  */
-unsigned int update_temp(int error)
+int update_temp(int error)
 {
 	int acum = E * previous_temp + A * error + B * error_minus1 + C * error_minus2;
 	previous_temp = acum;

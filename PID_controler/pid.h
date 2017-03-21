@@ -5,12 +5,12 @@
 #define FREQ_FILE "/sys/devices/system/cpu/cpu0/cpufreq/scaling_available_frequencies"
 
 // Choose the correct frequency
-unsigned int which_freq(unsigned int);
+int which_freq(int freq);
 
 // Update the temperature and return the choosen frequency 
-unsigned int update_temp(int);
+int update_temp(int error);
 
 // initialize the constants for the formula
-int initialize_pid();
+int initialize_pid(void);
 
 #endif
