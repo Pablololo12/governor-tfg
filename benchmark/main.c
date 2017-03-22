@@ -32,7 +32,7 @@ int main(int argc, char **argv)
 	}
 
 
-	printf("Starting test...");
+	printf("Starting test...\n");
 	clock_t begin = clock();
 	//while (1==1) {
 	for (int i=0; i<=10; i++) {
