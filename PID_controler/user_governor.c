@@ -2,6 +2,8 @@
 #include "graph_lib/graph.h"
 #include <stdio.h>
 #include <unistd.h>
+#include <string.h>
+#include <fcntl.h>
 #include <stdlib.h>
 
 // TODO: Find by itself the correct thermal zone
@@ -15,10 +17,10 @@
 
 // Files to get temperature info and set frequencies
 static FILE *temp;
-static FILE *cpu_0;
-static FILE *cpu_1;
-static FILE *cpu_2;
-static FILE *cpu_3;
+static int cpu_0;
+static int cpu_1;
+static int cpu_2;
+static int cpu_3;
 
 // Declaration of the function
 int open_files(void);
@@ -34,26 +36,26 @@ int open_files(void)
 		return -1;
 	}
 	
-	cpu_0 = fopen(CPU0_FREQ, "w");
-	if (cpu_0 == NULL) {
+	cpu_0 = open(CPU0_FREQ, O_WRONLY);
+	if (cpu_0 == -1) {
 		fprintf(stderr, "Error openning cpu0\n");
 		return -1;
 	}
 
-	cpu_1 = fopen(CPU1_FREQ, "w");
-	if (cpu_1 == NULL) {
+	cpu_1 = open(CPU1_FREQ, O_WRONLY);
+	if (cpu_1 == -1) {
 		fprintf(stderr, "Error openning cpu1\n");
 		return -1;
 	}
 
-	cpu_2 = fopen(CPU2_FREQ, "w");
-	if (cpu_2 == NULL) {
+	cpu_2 = open(CPU2_FREQ, O_WRONLY);
+	if (cpu_2 == -1) {
 		fprintf(stderr, "Error openning cpu2\n");
 		return -1;
 	}
 
-	cpu_3= fopen(CPU3_FREQ, "w");
-	if (cpu_3 == NULL) {
+	cpu_3= open(CPU3_FREQ, O_WRONLY);
+	if (cpu_3 == -1) {
 		fprintf(stderr, "Error openning cpu3\n");
 		return -1;
 	}
@@ -67,6 +69,7 @@ int main(void)
 	int number_elements=0;
 	int aux = 0;
 	int new_freq = 0;
+	char freq_str[8];
 
 	// initialize the PID controller
 	if (initialize_pid()==-1) {
@@ -102,10 +105,11 @@ int main(void)
 		new_freq = update_temp(aux);
 
 		// Set the new freq
-		fprintf(cpu_0, "%d\n", new_freq);
-		fprintf(cpu_1, "%d\n", new_freq);
-		fprintf(cpu_2, "%d\n", new_freq);
-		fprintf(cpu_3, "%d\n", new_freq);
+		sprintf(freq_str,"%d", new_freq);
+		pwrite(cpu_0,freq_str,strlen(freq_str),0);
+		pwrite(cpu_1,freq_str,strlen(freq_str),0);
+		pwrite(cpu_2,freq_str,strlen(freq_str),0);
+		pwrite(cpu_3,freq_str,strlen(freq_str),0);
 
 		sleep(3);
 	}
