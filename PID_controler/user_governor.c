@@ -91,7 +91,7 @@ int main(void)
 		fscanf(temp,"%d", &aux);
 		
 		// Add the temperature to the historic of temperatures
-		temp_historic[number_elements++] = aux;
+		temp_historic[number_elements++] = aux/1000;
 		// If the array is full more space is added
 		if(number_elements == size) {
 			size += 200;
