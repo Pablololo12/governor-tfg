@@ -14,7 +14,7 @@ enum {
  * But we do the test 5 times
  */
 
-static const double FLOP = 671129600.0671129600.0671129600.0671129600.0671129600.0671129600.0;
+static const double FLOP = 671129600.0;
 
 
 int main(int argc, char **argv)
