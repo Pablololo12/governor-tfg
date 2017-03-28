@@ -6,6 +6,12 @@
 static int NUM_FREQ = 0;
 static int posible_freq[30];
 
+// Constants for the formula
+static int E = 0;
+static int A = 918+10000/25000;
+static int B = 0;
+static int C = 0;
+
 /*
  * Choose the correct frequency
  */
@@ -40,12 +46,6 @@ int update_temp(int error)
 	static int previous_temp = 0;
 	static int error_minus1 = 0;
 	static int error_minus2 = 0;
-
-	// Constants for the formula
-	static int E = 0;
-	static int A = 918+10000/25000;
-	static int B = 0;
-	static int C = 0;
 
 	int acum = E * previous_temp + A * error + B * error_minus1 + C * error_minus2;
 	previous_temp = acum;
