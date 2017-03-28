@@ -1,7 +1,7 @@
 #include "pid.h"
 #include "graph_lib/graph.h"
-#include <stdio.h>
 #include <unistd.h>
+#include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
 #include <stdlib.h>
@@ -22,13 +22,10 @@ static int cpu_1;
 static int cpu_2;
 static int cpu_3;
 
-// Declaration of the function
-int open_files(void);
-
 /*
  * Function to open the temperature file and the freq files
  */
-int open_files(void)
+static int open_files(void)
 {
 	temp = fopen(FILE_TEMP, "r");
 	if (temp == NULL) {

@@ -1,16 +1,6 @@
 #include "pid.h"
 #include <stdio.h>
 
-// Global variables
-static int previous_temp = 0;
-static int error_minus1 = 0;
-static int error_minus2 = 0;
-
-// Constants for the formula
-static int E = 0;
-static int A = 918+10000/25000;
-static int B = 0;
-static int C = 0;
 
 // Working frequencies
 static int NUM_FREQ = 0;
@@ -46,6 +36,17 @@ int which_freq(int freq)
  */
 int update_temp(int error)
 {
+	// Global variables
+	static int previous_temp = 0;
+	static int error_minus1 = 0;
+	static int error_minus2 = 0;
+
+	// Constants for the formula
+	static int E = 0;
+	static int A = 918+10000/25000;
+	static int B = 0;
+	static int C = 0;
+
 	int acum = E * previous_temp + A * error + B * error_minus1 + C * error_minus2;
 	previous_temp = acum;
 	error_minus2 = error_minus1;

@@ -7,7 +7,7 @@ WARNINGS=-Wall -Wextra -pedantic -Wshadow -Wpointer-arith -Wcast-align \
          -Wredundant-decls -Wnested-externs -Winline -Wno-long-long \
          -Wuninitialized -Wconversion -Wstrict-prototypes
 
-CFLAGS=-std=c11 -O3 $(WARNINGS)
+CFLAGS=-std=c11 -O2 $(WARNINGS)
 
 LIBS=-lncurses
 
