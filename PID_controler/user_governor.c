@@ -31,7 +31,7 @@ static int cpu_3;
 static int open_files(void)
 {
 	temp = open(FILE_TEMP, O_RDONLY);
-	if (temp == NULL) {
+	if (temp == -1) {
 		fprintf(stderr, "Error openning temperature file\n");
 		return -1;
 	}
