@@ -1,6 +1,9 @@
+// In order to use pread and pwrite
+#define _XOPEN_SOURCE 500
+#include <unistd.h>
+///////////////////
 #include "pid.h"
 #include "graph_lib/graph.h"
-#include <unistd.h>
 #include <stdio.h>
 #include <string.h>
 #include <fcntl.h>
@@ -16,7 +19,7 @@
 #define CPU3_FREQ "/sys/devices/system/cpu/cpu3/cpufreq/scaling_setspeed"
 
 // Files to get temperature info and set frequencies
-static FILE *temp;
+static int temp;
 static int cpu_0;
 static int cpu_1;
 static int cpu_2;
@@ -27,7 +30,7 @@ static int cpu_3;
  */
 static int open_files(void)
 {
-	temp = fopen(FILE_TEMP, "r");
+	temp = open(FILE_TEMP, O_RDONLY);
 	if (temp == NULL) {
 		fprintf(stderr, "Error openning temperature file\n");
 		return -1;
@@ -67,6 +70,7 @@ int main(void)
 	int aux = 0;
 	int new_freq = 0;
 	char freq_str[8];
+	char temp_buff[8];
 
 	// initialize the PID controller
 	if (initialize_pid()==-1) {
@@ -85,7 +89,8 @@ int main(void)
 
 	while (1) {
 		// Get the current temperature
-		fscanf(temp,"%d", &aux);
+		pread(temp,temp_buff,8, 0);
+		aux = (int) strtol(temp_buff,NULL,10);
 		
 		// Add the temperature to the historic of temperatures
 		temp_historic[number_elements++] = aux/1000;
