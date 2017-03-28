@@ -84,6 +84,7 @@ int initialize_pid()
 	while(!feof(fp_freq)) {
 		fscanf(fp_freq, "%d", &posible_freq[NUM_FREQ++]);
 	}
+	NUM_FREQ--;
 
 	fclose(fp_const);
 
