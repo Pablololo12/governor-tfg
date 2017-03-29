@@ -50,8 +50,8 @@ static int open_files(void)
 
 		// Get the path of the current cpu starting with 0
 		snprintf(path, sizeof(path),
-                 PATH_TO_CPU "/cpu%u/cpufreq/scaling_setspeed",
-                 i);
+		         PATH_TO_CPU "/cpu%u/cpufreq/scaling_setspeed",
+		         i);
 		cpus_fd[i] = open(path, O_WRONLY);
 		
 		if (cpus_fd[i] == -1) {
@@ -101,7 +101,7 @@ int main(void)
 		if(number_elements == size) {
 			size += ELEMENST_TO_ADD;
 			temp_historic = realloc(temp_historic,
-									(unsigned long)(size * (int)(sizeof(int))));
+			                        (unsigned long)(size * (int)(sizeof(int))));
 			if (temp_historic == NULL) {
 				return 1;
 			}
