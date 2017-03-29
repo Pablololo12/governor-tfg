@@ -9,68 +9,71 @@
 #include <fcntl.h>
 #include <stdlib.h>
 
+// Constants
+enum = {
+		DESIRED_TEMP = 70000, // The desired temperature TODO: File config
+		ELEMENST_TO_ADD = 200}; // Constant for the array of values
+
 // TODO: Find by itself the correct thermal zone
 #define FILE_TEMP "/sys/class/thermal/thermal_zone0/temp"
 
-// TODO: Discover automatically the number of cpus
-#define CPU0_FREQ "/sys/devices/system/cpu/cpu0/cpufreq/scaling_setspeed"
-#define CPU1_FREQ "/sys/devices/system/cpu/cpu1/cpufreq/scaling_setspeed"
-#define CPU2_FREQ "/sys/devices/system/cpu/cpu2/cpufreq/scaling_setspeed"
-#define CPU3_FREQ "/sys/devices/system/cpu/cpu3/cpufreq/scaling_setspeed"
+// Directory of cpus
+#define CPU0_FREQ "/sys/devices/system/cpu"
 
 // Files to get temperature info and set frequencies
 static int temp;
-static int cpu_0;
-static int cpu_1;
-static int cpu_2;
-static int cpu_3;
+static int num_cpus = 0;
+static int *cpus_fd;
 
 /*
  * Function to open the temperature file and the freq files
  */
 static int open_files(void)
 {
+	// open the temperature file
 	temp = open(FILE_TEMP, O_RDONLY);
 	if (temp == -1) {
 		fprintf(stderr, "Error openning temperature file\n");
 		return -1;
 	}
 	
-	cpu_0 = open(CPU0_FREQ, O_WRONLY);
-	if (cpu_0 == -1) {
-		fprintf(stderr, "Error openning cpu0\n");
-		return -1;
+	// Get the number of cpus that are currently online
+	num_cpus = (int) sysconfig(_SC_NPROCESSORS_ONLN);
+	cpus_fd = (* int) malloc(num_cpus * sizeof(int));
+	// Array to keep the path of cpus
+	char path[255];
+	int i;
+
+	for (i=0; i<num_cpus; i++) {
+		// path and snprintf thanks to 
+		// https://github.com/tud-zih-energy/libadapt/blob/master/knobs/fastcpufreq.c
+
+		// Get the path of the current cpu starting with 0
+		snprintf(path, sizeof(path),
+                 PATH_TO_CPU "/cpu%u/cpufreq/scaling_setspeed",
+                 i);
+		cpus_fd[i] = open(path, O_WRONLY);
+		
+		if (cpus_fd[i] == -1) {
+			fprintf(stderr, "Error openning cpu%d\n",i);
+			return -1;
+		}
 	}
 
-	cpu_1 = open(CPU1_FREQ, O_WRONLY);
-	if (cpu_1 == -1) {
-		fprintf(stderr, "Error openning cpu1\n");
-		return -1;
-	}
-
-	cpu_2 = open(CPU2_FREQ, O_WRONLY);
-	if (cpu_2 == -1) {
-		fprintf(stderr, "Error openning cpu2\n");
-		return -1;
-	}
-
-	cpu_3= open(CPU3_FREQ, O_WRONLY);
-	if (cpu_3 == -1) {
-		fprintf(stderr, "Error openning cpu3\n");
-		return -1;
-	}
 	return 1;
 }
 
 int main(void)
 {
-	int size=200;
+	int size = ELEMENST_TO_ADD; // Size of the array of the latest temperatures
+	// Array to keep an historic of the temperatures
 	int *temp_historic = malloc((unsigned long)(size*(int)(sizeof(int))));
-	int number_elements=0;
-	int aux = 0;
-	int new_freq = 0;
-	char freq_str[8];
-	char temp_buff[8];
+	int number_elements=0; // Pointer of the historic array
+	int aux = 0; // Auxiliar variable to keep temperature
+	int new_freq = 0; // Auxiliar variable to save new frequency
+	char freq_str[8]; // Char array used to write frequency
+	char temp_buff[8]; // Char array used to read the current temperature
+	int i; // Auxiliary variable
 
 	// initialize the PID controller
 	if (initialize_pid()==-1) {
@@ -96,22 +99,26 @@ int main(void)
 		temp_historic[number_elements++] = aux/1000;
 		// If the array is full more space is added
 		if(number_elements == size) {
-			size += 200;
-			temp_historic = realloc(temp_historic, (unsigned long)(size * (int)(sizeof(int))));
+			size += ELEMENST_TO_ADD;
+			temp_historic = realloc(temp_historic,
+									(unsigned long)(size * (int)(sizeof(int))));
+			if (temp_historic == NULL) {
+				return 1;
+			}
 		}
 
 		// Print the new graph
 		print_graph(temp_historic, number_elements);
 
 		// Update the PID
-		new_freq = update_temp(85000-aux);
+		new_freq = update_temp(DESIRED_TEMP-aux);
 
 		// Set the new freq
 		sprintf(freq_str,"%d", new_freq);
-		pwrite(cpu_0,freq_str,strlen(freq_str),0);
-		pwrite(cpu_1,freq_str,strlen(freq_str),0);
-		pwrite(cpu_2,freq_str,strlen(freq_str),0);
-		pwrite(cpu_3,freq_str,strlen(freq_str),0);
+		// Set the frequency to each cpu
+		for (i=0; i<num_cpus; i++) {
+			pwrite(cpus_fd[i], freq_str, strlen(freq_str),0);
+		}
 
 		sleep(3);
 	}
