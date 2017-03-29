@@ -11,8 +11,8 @@
 
 // Constants
 enum = {
-		DESIRED_TEMP = 70000, // The desired temperature TODO: File config
-		ELEMENST_TO_ADD = 200}; // Constant for the array of values
+        DESIRED_TEMP = 70000, // The desired temperature TODO: File config
+        ELEMENST_TO_ADD = 200}; // Constant for the array of values
 
 // TODO: Find by itself the correct thermal zone
 #define FILE_TEMP "/sys/class/thermal/thermal_zone0/temp"
