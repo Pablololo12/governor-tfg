@@ -13,6 +13,6 @@ fi
 
 while true;
 do
-	cat /sys/class/thermal/thermal_zone0/temp >>temps_log.txt
+	cat /sys/class/thermal/thermal_zone0/temp >>$filename
 	sleep 1
 done
