@@ -13,6 +13,6 @@ fi
 
 while true;
 do
-	cat /sys/class/thermal/thermal_zone0/temp >>$filename
+	cat /sys/class/thermal/thermal_zone0/temp /sys/devices/system/cpu/cpu0/cpufreq/cpuinfo_cur_freq | tr "\\n" " " | sed 's/,$//' >>$filename
 	sleep 1
 done
