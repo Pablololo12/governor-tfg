@@ -8,9 +8,10 @@
 #include <string.h>
 #include <fcntl.h>
 #include <stdlib.h>
+#include <unistd.h>
 
 // Constants
-enum = {
+enum {
         DESIRED_TEMP = 70000, // The desired temperature TODO: File config
         ELEMENST_TO_ADD = 200}; // Constant for the array of values
 
@@ -18,7 +19,7 @@ enum = {
 #define FILE_TEMP "/sys/class/thermal/thermal_zone0/temp"
 
 // Directory of cpus
-#define CPU0_FREQ "/sys/devices/system/cpu"
+#define PATH_TO_CPU "/sys/devices/system/cpu"
 
 // Files to get temperature info and set frequencies
 static int temp;
@@ -39,7 +40,7 @@ static int open_files(void)
 	
 	// Get the number of cpus that are currently online
 	num_cpus = (int) sysconfig(_SC_NPROCESSORS_ONLN);
-	cpus_fd = (* int) malloc(num_cpus * sizeof(int));
+	cpus_fd = (int *) malloc(num_cpus * sizeof(int));
 	// Array to keep the path of cpus
 	char path[255];
 	int i;
