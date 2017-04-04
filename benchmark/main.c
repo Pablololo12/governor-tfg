@@ -19,7 +19,7 @@ static const double FLOP = 1342259200.0;
 
 int main(int argc, char **argv)
 {
-	char * default_name = "bench_result.txt";
+	char * default_name = (char *)"bench_result.txt";
 	FILE * fp;
 	uint32_t matrixSize = ROWS*COLUMNS;
 
@@ -37,11 +37,13 @@ int main(int argc, char **argv)
 	float *B = new float[matrixSize];
 	float *C = new float[matrixSize];
 
+	printf("Filling matrixs\n");
 	for (uint32_t i=0; i<matrixSize;i++) {
 		A[i]=(float)rand()/(float)(RAND_MAX/1000);
 		B[i]=(float)rand()/(float)(RAND_MAX/1000);
 	}
 
+	printf("Starting test\n");
 	for (int i=0; i<10; i++) {
 		clock_t begin = clock();
 		
@@ -55,7 +57,7 @@ int main(int argc, char **argv)
 
 		printf("Iteration: %d time: %f Mflops: %f\n", i, time_spent, flops);
 		fprintf(fp, "%d %f %f\n", i, time_spent, flops);
-		
+		fflush(fp);
 		float *aux=C;
 		C=A;
 		A=aux;
