@@ -53,9 +53,11 @@ static int open_files(void)
 		snprintf(path, sizeof(path),
 		         PATH_TO_CPU "/cpu%u/cpufreq/scaling_setspeed",
 		         i);
+
 		cpus_fd[i] = open(path, O_WRONLY);
 		
 		if (cpus_fd[i] == -1) {
+			fprintf(stderr, "%s\n", path);
 			fprintf(stderr, "Error openning cpu%d\n",i);
 			return -1;
 		}
