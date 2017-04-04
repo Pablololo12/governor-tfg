@@ -19,21 +19,29 @@ static const double FLOP = 1342259200.0;
 
 int main(int argc, char **argv)
 {
+	char * default_name = "bench_result.txt";
+	FILE * fp;
 	uint32_t matrixSize = ROWS*COLUMNS;
+
+	if (argc == 2) {
+		default_name = argv[1];
+	}
+
+	fp = fopen(default_name, "w");
+	if (fp == NULL) {
+		fprintf(stderr, "Error opening file %s\n", default_name);
+		return 0;
+	}
 
 	float *A = new float[matrixSize];
 	float *B = new float[matrixSize];
 	float *C = new float[matrixSize];
 
-	printf("Filling matrix\n");
 	for (uint32_t i=0; i<matrixSize;i++) {
 		A[i]=(float)rand()/(float)(RAND_MAX/1000);
 		B[i]=(float)rand()/(float)(RAND_MAX/1000);
 	}
 
-
-	printf("Starting test...\n");
-	
 	for (int i=0; i<10; i++) {
 		clock_t begin = clock();
 		
@@ -43,13 +51,17 @@ int main(int argc, char **argv)
 		clock_t end = clock();
 		double time_spent = (double)(end - begin) / CLOCKS_PER_SEC;
 		double flops = FLOP / time_spent;
+		flops = flops / 1000000;
 
-		printf("Iteration: %d time: %f flops: %f\n", i, time_spent, flops);
+		printf("Iteration: %d time: %f Mflops: %f\n", i, time_spent, flops);
+		fprintf(fp, "%d %f %f\n", i, time_spent, flops);
 		
 		float *aux=C;
 		C=A;
 		A=aux;
 	}
+
+	fclose(fp);
 
 	return 0;
 }
