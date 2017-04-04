@@ -23,7 +23,7 @@ enum {
 
 // Files to get temperature info and set frequencies
 static int temp;
-static int num_cpus = 0;
+static unsigned int num_cpus = 0;
 static int *cpus_fd;
 
 /*
@@ -39,7 +39,7 @@ static int open_files(void)
 	}
 	
 	// Get the number of cpus that are currently online
-	num_cpus = (int) sysconfig(_SC_NPROCESSORS_ONLN);
+	num_cpus = (unsigned int) sysconf(_SC_NPROCESSORS_ONLN);
 	cpus_fd = (int *) malloc(num_cpus * sizeof(int));
 	// Array to keep the path of cpus
 	char path[255];
