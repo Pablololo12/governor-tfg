@@ -1,4 +1,5 @@
- fileID = fopen('/Users/Pablo/Documents/Universidad/governor-tfg/results/Nuevo_Benchmark/1CPU/state_918000.txt','r');
+%  fileID = fopen('/Users/Pablo/Documents/Universidad/governor-tfg/results/Nuevo_Benchmark/1CPU/state_918000.txt','r');
+ fileID = fopen('D:/Repositorios/governor-tfg/results/Nuevo_Benchmark/1CPU/state_918000.txt','r');
  formatSpec = '%d';
  A = fscanf(fileID, formatSpec);
  Ts = 0.05; %Se toman muestras cada 3 segundos

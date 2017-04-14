@@ -1,4 +1,5 @@
 fileID = fopen('/Users/Pablo/Documents/Universidad/governor-tfg/results/Nuevo_Benchmark/4CPU/state_continuous.txt','r');
+ fileID = fopen('D:/Repositorios/governor-tfg/results/Nuevo_Benchmark/1CPU/state_918000.txt','r');
 %fileID = fopen('resultados/state_continuous.txt','r');
 formatSpec = '%d';
 B = fscanf(fileID, formatSpec);
