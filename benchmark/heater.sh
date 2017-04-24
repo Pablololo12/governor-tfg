@@ -70,7 +70,7 @@ do
 
 	if [ $dontsleep = 0 ]; then
 		echo -n "Cooling Down  "
-		while [ $(cat /sys/class/thermal/thermal_zone0/temp) -gt 47 ];
+		while [ $(cat /sys/class/thermal/thermal_zone0/temp) -gt 47000 ];
 		do
 			sleep 10
 		done
