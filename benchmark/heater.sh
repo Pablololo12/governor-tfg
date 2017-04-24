@@ -20,6 +20,8 @@ notworking=0
 dontsleep=0
 timer=600
 userspace=0
+export OMP_NUM_THREADS=4
+export QSML_NUM_THREADS=4
 
 
 while [ "$#" -gt 0 ]
@@ -31,6 +33,8 @@ do
 		echo 0 > /sys/devices/system/cpu/cpu2/online
 		echo 0 > /sys/devices/system/cpu/cpu3/online
 		echo -e "[\033[0;92mOK\033[0m]"
+		export OMP_NUM_THREADS=2
+		export QSML_NUM_THREADS=2
 	elif [ "$1" = -l ];
 	then
 		dontsleep=1
