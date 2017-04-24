@@ -1,5 +1,8 @@
 #!/bin/bash
 
+# Check if we are root
+[ "$(whoami)" != "root" ] && exec sudo -- "$0" "$@"
+
 echo -e "\033[0;36m============================================================"
 
 echo -e "\033[0;31m  _____ _____  _    _        _    _            _ "
@@ -14,26 +17,17 @@ echo -e "\033[0;36m============================================================\
 exec 2>/dev/null
 
 notworking=0
-params="--num-threads=4"
 dontsleep=0
 timer=600
+userspace=0
 
-
-echo -n "Setting Governor to userspace..."
-echo userspace >/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-echo userspace >/sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
-echo userspace >/sys/devices/system/cpu/cpu2/cpufreq/scaling_governor
-echo userspace >/sys/devices/system/cpu/cpu3/cpufreq/scaling_governor
-echo -e "[\033[0;92mOK\033[0m]"
 
 while [ "$#" -gt 0 ]
 do
 	if [ "$1" = -t ];
 	then
 		notworking=1
-		params="--num-threads=1"
 		echo -n "Shutting down cores..."
-		echo 0 > /sys/devices/system/cpu/cpu1/online
 		echo 0 > /sys/devices/system/cpu/cpu2/online
 		echo 0 > /sys/devices/system/cpu/cpu3/online
 		echo -e "[\033[0;92mOK\033[0m]"
@@ -43,6 +37,21 @@ do
 	elif [[ "$1" =~ ^[0-9]+$ ]];
 	then
 		timer=$1
+	elif [ "$1" = -u ];
+	then
+		echo -n "Setting Governor to userspace..."
+		echo userspace >/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+		echo userspace >/sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
+		echo userspace >/sys/devices/system/cpu/cpu2/cpufreq/scaling_governor
+		echo userspace >/sys/devices/system/cpu/cpu3/cpufreq/scaling_governor
+		echo -e "[\033[0;92mOK\033[0m]"
+		userspace=1
+	elif [ "$1" = u ];
+	then
+		echo "-t for only 2 cores"
+		echo "-l continuous execution"
+		echo "-u for userspace"
+		echo "number to change time"
 	fi
 	shift
 done
@@ -70,7 +79,7 @@ do
 	done
 
 	echo -n "Starting test at $freq KHz  "
-	./benchmark $params >~/log.txt &
+	./benchmark >~/log.txt &
 	pid=$!
 
 	sleep $timer && kill -9 $pid &
@@ -93,15 +102,17 @@ done
 if [ $notworking = 1 ];
 then
 	echo -n "Starting back cores..."
-	echo 1 > /sys/devices/system/cpu/cpu1/online
 	echo 1 > /sys/devices/system/cpu/cpu2/online
 	echo 1 > /sys/devices/system/cpu/cpu3/online
 	echo -e "[\033[0;92mOK\033[0m]"
 fi
 
-echo -n "Setting Governor back to ondemand..."
-echo ondemand >/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
-echo ondemand >/sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
-echo ondemand >/sys/devices/system/cpu/cpu2/cpufreq/scaling_governor
-echo ondemand >/sys/devices/system/cpu/cpu3/cpufreq/scaling_governor
-echo -e "[\033[0;92mOK\033[0m]"
+if [ $userspace = 1 ];
+then
+	echo -n "Setting Governor back to ondemand..."
+	echo ondemand >/sys/devices/system/cpu/cpu0/cpufreq/scaling_governor
+	echo ondemand >/sys/devices/system/cpu/cpu1/cpufreq/scaling_governor
+	echo ondemand >/sys/devices/system/cpu/cpu2/cpufreq/scaling_governor
+	echo ondemand >/sys/devices/system/cpu/cpu3/cpufreq/scaling_governor
+	echo -e "[\033[0;92mOK\033[0m]"
+fi
