@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Check if we are root
-[ "$(whoami)" != "root" ] && exec sudo -- "$0" "$@"
+[ "$(whoami)" != "root" ] && exec sudo -E -- "$0" "$@"
 
 echo -e "\033[0;36m============================================================"
 
@@ -22,7 +22,7 @@ timer=600
 userspace=0
 export OMP_NUM_THREADS=4
 export QSML_NUM_THREADS=4
-
+export LD_LIBRARY_PATH=/home/linaro/gcc-4.8/lib/
 
 while [ "$#" -gt 0 ]
 do
@@ -83,7 +83,7 @@ do
 	done
 
 	echo -n "Starting test at $freq KHz  "
-	./benchmark >~/log.txt &
+	./benchmark >log.txt &
 	pid=$!
 
 	sleep $timer && kill -9 $pid &
