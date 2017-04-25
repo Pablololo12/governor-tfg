@@ -20,6 +20,7 @@ notworking=0
 dontsleep=0
 timer=600
 userspace=0
+first_time=1
 export OMP_NUM_THREADS=4
 export QSML_NUM_THREADS=4
 export LD_LIBRARY_PATH=/home/linaro/gcc-4.8/lib/
@@ -83,10 +84,20 @@ do
 	done
 
 	echo -n "Starting test at $freq KHz  "
-	./benchmark >log.txt &
-	pid=$!
+	# In case of stop
+	if [ $dontsleep = 0 ]; then
+		./benchmark >log.txt &
+		pid=$!
 
-	sleep $timer && kill -9 $pid &
+		sleep $timer && kill -9 $pid &
+	else # Continuous execution
+		if [ $first_time = 1 ]; then
+			./benchmark >log.txt &
+			first_time=0
+		fi
+		sleep $timer &
+		pid=$!
+	fi
 
 	while kill -0 $pid 2>/dev/null;
 	do
