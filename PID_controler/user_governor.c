@@ -43,7 +43,7 @@ static int open_files(void)
 	cpus_fd = (int *) malloc(num_cpus * sizeof(int));
 	// Array to keep the path of cpus
 	char path[255];
-	int i;
+	unsigned int i;
 
 	for (i=0; i<num_cpus; i++) {
 		// path and snprintf thanks to 
@@ -76,7 +76,7 @@ int main(void)
 	int new_freq = 0; // Auxiliar variable to save new frequency
 	char freq_str[8]; // Char array used to write frequency
 	char temp_buff[8]; // Char array used to read the current temperature
-	int i; // Auxiliary variable
+	unsigned int i; // Auxiliary variable
 
 	// initialize the PID controller
 	if (initialize_pid()==-1) {
