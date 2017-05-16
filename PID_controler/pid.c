@@ -8,6 +8,7 @@ static int posible_freq[30];
 
 // Constants for the formula
 static int E = 0;
+static int F = 0;
 static int A = 918+10000/25000; // K = (fmax - f0) / error_maximo
 static int B = 0;
 static int C = 0;
@@ -43,12 +44,14 @@ int which_freq(int freq)
 int update_temp(int error)
 {
 	// Global variables
-	static int previous_temp = 0;
+	static int previous_freq = 0;
+	static int previous_freq2 = 0;
 	static int error_minus1 = 0;
 	static int error_minus2 = 0;
 
-	int acum = E * previous_temp + A * error + B * error_minus1 + C * error_minus2;
-	previous_temp = acum;
+	int acum = E * previous_freq + F * previous_freq2 + A * error + B * error_minus1 + C * error_minus2;
+	previous_freq2 = previous_freq;
+	previous_freq = acum;
 	error_minus2 = error_minus1;
 	error_minus1 = error;
 
@@ -70,7 +73,7 @@ int initialize_pid()
 		return -1;
 	}
 
-	fscanf(fp_const, "%d %d %d %d", &E, &A, &B, &C);
+	fscanf(fp_const, "%d %d %d %d %d", &E, &F, &A, &B, &C);
 
 	fclose(fp_const);
 
