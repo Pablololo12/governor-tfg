@@ -1,5 +1,6 @@
-fileID = fopen('/Users/Pablo/Documents/Universidad/governor-tfg/results/Nuevo_Benchmark/4CPU/state_continuous.txt','r');
- fileID = fopen('D:/Repositorios/governor-tfg/results/Nuevo_Benchmark/1CPU/state_918000.txt','r');
+%fileID = fopen('/Users/Pablo/Documents/Universidad/governor-tfg/benchmark/results/2_core_cont/state_continuous.txt','r');
+fileID = fopen('/Users/Pablo/Documents/Universidad/governor-tfg/benchmark/results/2_cores_step/state_1026000.txt','r');
+%fileID = fopen('D:/Repositorios/governor-tfg/results/Nuevo_Benchmark/1CPU/state_918000.txt','r');
 %fileID = fopen('resultados/state_continuous.txt','r');
 formatSpec = '%d';
 B = fscanf(fileID, formatSpec);
@@ -39,7 +40,7 @@ set(gcf,'DefaultAxesTitleFontSizeMultiplier',1,...
 resid(sysTF,data);
 %%
 clf
-compare(data,sysTF)
+%compare(data,sysTF)
 %%
 % The figure shows that residuals are strongly correlated implying there is
 % information in the measured data that has not been adequately captured by
@@ -55,7 +56,7 @@ compare(data,sysTF)
 % system and estimate a transfer function using this system as the initial
 % guess.
 sysInit = idtf(NaN,[1 NaN],'ioDelay',NaN);
-sysInit.TimeUnit = 'minutes';
+sysInit.TimeUnit = 'seconds';
 %% 
 % Restrict the transfer function numerator and denominator terms so that
 % the system is stable with positive gain.
@@ -77,7 +78,7 @@ sysTF_initialized = tfest(data,sysInit)
 resid(sysTF_initialized,data);
 %%
 clf
-compare(data,sysTF,sysTF_initialized)
+%compare(data,sysTF,sysTF_initialized)
 
 %% Process Model Estimation
 % 
@@ -96,7 +97,7 @@ sysP1D  = procest(data,'P1D')
 resid(sysP1D,data);
 %%
 clf
-compare(data,sysTF,sysTF_initialized,sysP1D)
+%compare(data,sysTF,sysTF_initialized,sysP1D)
 
 %% Process Model Estimation with Disturbance Model
 %
@@ -109,17 +110,17 @@ compare(data,sysTF,sysTF_initialized,sysP1D)
 % Create a 'P1D' process model with restriction on delay and time constant
 % values and use this as the initial guess for the estimation problem. 
 %
-sysInit = idproc('P1D','TimeUnit','minutes');
+sysInit = idproc('P1D','TimeUnit','seconds');
 %%
 % Restrict the model to have positive gain, and delay in the
 % range [0 1] minute.
-sysInit.Structure.Kp.Value    = 1;
+sysInit.Structure.Kp.Value    = 1e-4;
 sysInit.Structure.Kp.Minimum  = 0;
-sysInit.Structure.Tp1.Value   = 1;
-sysInit.Structure.Tp1.Maximum = 10;
-sysInit.Structure.Td.Value    = 0.2;
+sysInit.Structure.Tp1.Value   = 120;
+%sysInit.Structure.Tp1.Maximum = 10;
+sysInit.Structure.Td.Value    = 8;
 sysInit.Structure.Td.Minimum  = 0;
-sysInit.Structure.Td.Maximum  = 1;
+%sysInit.Structure.Td.Maximum  = 1;
 
 %%
 % Specify the option to use a first-order model ('ARMA1') for the
@@ -133,7 +134,8 @@ sysP1D_noise = procest(data,sysInit,opt);
 resid(sysP1D_noise,data);
 %%
 clf
-compare(data,sysTF,sysTF_initialized,sysP1D,sysP1D_noise);
+%compare(data,sysTF,sysTF_initialized,sysP1D,sysP1D_noise);
+compare(data,sysP1D_noise);
 %%
 % The residual plot clearly shows that the residuals are uncorrelated
 % implying that we have a model that explains the measured data. The

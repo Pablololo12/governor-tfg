@@ -8,7 +8,7 @@ static int posible_freq[30];
 
 // Constants for the formula
 static int E = 0;
-static int A = 918+10000/25000;
+static int A = 918+10000/25000; // K = (fmax - f0) / error_maximo
 static int B = 0;
 static int C = 0;
 

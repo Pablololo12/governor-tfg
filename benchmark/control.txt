@@ -1,0 +1,37 @@
+# Lista de variables que da el modelo
+
+Para continuo:
+
+	Kp = 9.9135e-05
+	Tp1 = 1e-06
+	Td = 11.601
+
+Para 384000:
+
+Para 486000:
+	Kp = 0.0001429               
+	Tp1 = 144.21                  
+	Td = 2.178
+
+Para 594000:
+	Kp = 0.0001197               
+	Tp1 = 149.09                  
+	Td = 5.922
+
+Para 702000:
+	Kp = 0.00010425              
+	Tp1 = 122.31                  
+	Td = 8.721
+
+Para 810000:
+
+
+Para 918000:
+	Kp = 8.504e-05               
+	Tp1 = 119.93                  
+	Td = 7.896
+
+Para 1026000:
+	Kp = 8.2746e-05              
+	Tp1 = 114.79                  
+	Td = 0

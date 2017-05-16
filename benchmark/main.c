@@ -14,6 +14,10 @@ enum {
  * But we do the test 10 times
  */
 
+/*
+ * 6.915639 MFLOPs * 194.090418 s = 1342259264 flop
+ */
+
 static const double FLOP = 1342259200.0;
 
 
