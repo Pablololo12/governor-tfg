@@ -7,27 +7,28 @@ static int NUM_FREQ = 0;
 static int posible_freq[30];
 
 // Constants for the formula
-static int E = 0;
-static int F = 0;
-static int A = 918+10000/25000; // K = (fmax - f0) / error_maximo
-static int B = 0;
-static int C = 0;
+static float E = 0;
+static float F = 0;
+static float A = 918+10000/25000; // K = (fmax - f0) / error_maximo
+static float B = 0;
+static float C = 0;
 
 /*
  * Choose the correct frequency
  */
-int which_freq(int freq)
+int which_freq(float freq)
 {
+	int freq_int = (int) freq;
 	int i;
-	if(freq < posible_freq[0]) {
+	if(freq_int < posible_freq[0]) {
 		return posible_freq[0];
 	}
 
 	for (i=1; i<NUM_FREQ; i++) {
-		if (freq < posible_freq[i]) {
+		if (freq_int < posible_freq[i]) {
 			int mean = (posible_freq[i] + posible_freq[i-1]) >> 1;
 			
-			if (freq < mean) {
+			if (freq_int < mean) {
 				return posible_freq[i-1];
 			} else {
 				return posible_freq[i];
@@ -44,12 +45,12 @@ int which_freq(int freq)
 int update_temp(int error)
 {
 	// Global variables
-	static int previous_freq = 0;
-	static int previous_freq2 = 0;
-	static int error_minus1 = 0;
-	static int error_minus2 = 0;
+	static float previous_freq = 0;
+	static float previous_freq2 = 0;
+	static float error_minus1 = 0;
+	static float error_minus2 = 0;
 
-	int acum = E * previous_freq + F * previous_freq2 + A * error + B * error_minus1 + C * error_minus2;
+	float acum = E * previous_freq + F * previous_freq2 + A * error + B * error_minus1 + C * error_minus2;
 	previous_freq2 = previous_freq;
 	previous_freq = acum;
 	error_minus2 = error_minus1;
@@ -73,7 +74,7 @@ int initialize_pid()
 		return -1;
 	}
 
-	fscanf(fp_const, "%d %d %d %d %d", &E, &F, &A, &B, &C);
+	fscanf(fp_const, "%f %f %f %f %f", &E, &F, &A, &B, &C);
 
 	fclose(fp_const);
 
