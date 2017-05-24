@@ -114,7 +114,7 @@ int main(void)
 		print_graph(temp_historic, number_elements);
 
 		// Update the PID
-		new_freq = update_temp(DESIRED_TEMP-aux);
+		new_freq = update_temp((DESIRED_TEMP-aux)/1000.0);
 
 		// Set the new freq
 		sprintf(freq_str,"%d", new_freq);

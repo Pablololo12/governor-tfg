@@ -8,7 +8,7 @@
 int which_freq(float freq);
 
 // Update the temperature and return the choosen frequency 
-int update_temp(int error);
+int update_temp(float error);
 
 // initialize the constants for the formula
 int initialize_pid(void);

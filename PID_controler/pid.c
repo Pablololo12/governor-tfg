@@ -42,7 +42,7 @@ int which_freq(float freq)
 /*
  * Return the temperature
  */
-int update_temp(int error)
+int update_temp(float error)
 {
 	// Global variables
 	static float previous_freq = 0;
@@ -51,6 +51,7 @@ int update_temp(int error)
 	static float error_minus2 = 0;
 
 	float acum = E * previous_freq + F * previous_freq2 + A * error + B * error_minus1 + C * error_minus2;
+
 	previous_freq2 = previous_freq;
 	previous_freq = acum;
 	error_minus2 = error_minus1;
