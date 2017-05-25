@@ -1,7 +1,9 @@
 %fileID = fopen('/Users/Pablo/Documents/Universidad/governor-tfg/benchmark/results/2_core_cont/state_continuous.txt','r');
 fileID = fopen('/Users/Pablo/Documents/Universidad/governor-tfg/benchmark/results/2_cores_step/state_1026000.txt','r');
-%fileID = fopen('D:/Repositorios/governor-tfg/results/Nuevo_Benchmark/1CPU/state_918000.txt','r');
+% fileID = fopen('D:/Repositorios/governor-tfg/results/Nuevo_Benchmark/1CPU/state_918000.txt','r');
 %fileID = fopen('resultados/state_continuous.txt','r');
+fileID = fopen('E:/Git_repositories/governor-tfg/results/Nuevo_Benchmark/1CPU/state_918000.txt','r');
+
 formatSpec = '%d';
 B = fscanf(fileID, formatSpec);
 fclose(fileID);
