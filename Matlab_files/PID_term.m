@@ -1,9 +1,9 @@
 clear all
 
 Ti = 90;
-Td = 5;
+Td = 0.001;
 K = 15000;
-alfa = 0.9; %% Entre 0 y 1
+alfa = 0.999; %% Entre 0 y 1
 
 s = tf('s');
 C = K*(Ti*s+1)/Ti/s*(Td*s+1)/(alfa*Td*s+1)
