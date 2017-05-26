@@ -13,6 +13,13 @@ static float A = 918+10000/25000; // K = (fmax - f0) / error_maximo
 static float B = 0;
 static float C = 0;
 
+static FILE *fp_log;
+
+
+/*
+ *  ToDo: Guardar Error u teorica 
+ * Probar con A 20k 30k 50k 75k 100k
+ */
 /*
  * Choose the correct frequency
  */
@@ -45,19 +52,21 @@ int which_freq(float freq)
 int update_temp(float error)
 {
 	// Global variables
-	static float previous_freq = 0;
-	static float previous_freq2 = 0;
-	static float error_minus1 = 0;
-	static float error_minus2 = 0;
+	static float u1 = 0;
+	static float u2 = 0;
+	static float e1 = 0;
+	static float e2 = 0;
 
-	float acum = E * previous_freq + F * previous_freq2 + A * error + B * error_minus1 + C * error_minus2;
+	float u = E * u1 + F * u2 + A * error + B * e1 + C * e2;
 
-	previous_freq2 = previous_freq;
-	previous_freq = acum;
-	error_minus2 = error_minus1;
-	error_minus1 = error;
+	u2 = u1;
+	u1 = u;
+	e2 = e1;
+	e1 = error;
 
-	return which_freq(acum);
+	fprintf(fp_log, "%f %f\n", error, u);
+
+	return which_freq(u);
 }
 
 /*
@@ -69,6 +78,7 @@ int initialize_pid()
 	FILE *fp_freq;
 
 	fp_const = fopen(CONST_FILE, "r");
+	fp_log = fopen(LOG_FILE, "w");
 
 	if(fp_const==NULL) {
 		fprintf(stderr, "Error openning CONST_FILE\n");
