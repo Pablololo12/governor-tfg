@@ -121,7 +121,7 @@ int main(void)
 		// Update the PID
 		new_freq = update_temp((DESIRED_TEMP-aux)/1000.0);
 
-		fprintf(gov_log, "%d %f\n", aux, new_freq);
+		fprintf(gov_log, "%d %d\n", aux, new_freq);
 		// Set the new freq
 		sprintf(freq_str,"%d", new_freq);
 		// Set the frequency to each cpu
