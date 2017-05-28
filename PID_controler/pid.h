@@ -2,7 +2,7 @@
 #define _PID_LIB_
 
 #define CONST_FILE "/home/linaro/constants.txt"
-#define LOG_FILE "/home/linaro/pid_log.txt"
+#define LOG_FILE "./pid_log.txt"
 #define FREQ_FILE "/sys/devices/system/cpu/cpu0/cpufreq/scaling_available_frequencies"
 
 // Choose the correct frequency

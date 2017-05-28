@@ -12,7 +12,7 @@
 
 // Constants
 enum {
-        DESIRED_TEMP = 70000, // The desired temperature TODO: File config
+        DESIRED_TEMP = 80000, // The desired temperature TODO: File config
         ELEMENST_TO_ADD = 200}; // Constant for the array of values
 
 // TODO: Find by itself the correct thermal zone
@@ -21,16 +21,21 @@ enum {
 // Directory of cpus
 #define PATH_TO_CPU "/sys/devices/system/cpu"
 
+#define PATH_TO_LOG "./gob_log.txt"
+
 // Files to get temperature info and set frequencies
 static int temp;
 static unsigned int num_cpus = 0;
 static int *cpus_fd;
+static FILE *gov_log;
 
 /*
  * Function to open the temperature file and the freq files
  */
 static int open_files(void)
 {
+	gov_log = fopen(PATH_TO_LOG, "w");
+
 	// open the temperature file
 	temp = open(FILE_TEMP, O_RDONLY);
 	if (temp == -1) {
@@ -116,6 +121,7 @@ int main(void)
 		// Update the PID
 		new_freq = update_temp((DESIRED_TEMP-aux)/1000.0);
 
+		fprintf(gov_log, "%d %f\n", aux, new_freq);
 		// Set the new freq
 		sprintf(freq_str,"%d", new_freq);
 		// Set the frequency to each cpu
