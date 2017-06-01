@@ -61,7 +61,7 @@ int update_temp(float error)
 	static float e1 = 0;
 	static float e2 = 0;
 
-	float u = E * u1 + F * u2 + A * error + B * e1 + C * e2;
+	float u = -E * u1 - F * u2 + A * error + B * e1 + C * e2;
 
 	u2 = u1;
 	u1 = u;

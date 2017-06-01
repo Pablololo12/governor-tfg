@@ -27,14 +27,14 @@ enum {
 static int temp;
 static unsigned int num_cpus = 0;
 static int *cpus_fd;
-static FILE *gov_log;
+static FILE *gob_log;
 
 /*
  * Function to open the temperature file and the freq files
  */
 static int open_files(void)
 {
-	gov_log = fopen(PATH_TO_LOG, "w");
+	gob_log = fopen(PATH_TO_LOG, "w");
 
 	// open the temperature file
 	temp = open(FILE_TEMP, O_RDONLY);
@@ -82,6 +82,7 @@ int main(void)
 	char freq_str[8]; // Char array used to write frequency
 	char temp_buff[8]; // Char array used to read the current temperature
 	unsigned int i; // Auxiliary variable
+	unsigned int flush = 0;
 
 	// initialize the PID controller
 	if (initialize_pid()==-1) {
@@ -121,7 +122,12 @@ int main(void)
 		// Update the PID
 		new_freq = update_temp((DESIRED_TEMP-aux)/1000.0);
 
-		fprintf(gov_log, "%d %d\n", aux, new_freq);
+		fprintf(gob_log, "%d %d\n", aux, new_freq);
+		++flush;
+		if (flush == 20) {
+			flush = 0;
+			fflush(gob_log);
+		}
 		// Set the new freq
 		sprintf(freq_str,"%d", new_freq);
 		// Set the frequency to each cpu
