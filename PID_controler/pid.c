@@ -15,15 +15,6 @@ static float C = 0;
 
 static FILE *fp_log;
 
-
-/*
- *  ToDo: Guardar Error u teorica 
- * Probar a 80 85 y 90 grados
- * Añadir como anexo a memoria las graficas de los resultados
- * Probando con distintas Trefs
- *
- * 
- */
 /*
  * Choose the correct frequency
  */
