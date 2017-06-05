@@ -6,6 +6,34 @@
 #include <linux/init.h>
 #include <linux/module.h>
 
+static int E = -1;
+static int F = 0;
+static int A = 50000;
+static int B = -49722;
+static int C = 0;
+
+
+
+/*************sysfs*****************************************/
+
+static struct governor_attr E_value =					\
+__ATTR(E_value, 0644, show_E_value, store_E_value)
+
+static struct governor_attr F_value =					\
+__ATTR(F_value, 0644, show_F_value, store_F_value)
+
+static struct governor_attr A_value =					\
+__ATTR(A_value, 0644, show_A_value, store_A_value)
+
+static struct governor_attr B_value =					\
+__ATTR(B_value, 0644, show_B_value, store_B_value)
+
+static struct governor_attr C_value =					\
+__ATTR(C_value, 0644, show_C_value, store_C_value)
+
+static struct governor_attr temp_obj =					\
+__ATTR(temp_obj, 0644, show_temp_obj, store_temp_obj)
+
 
 static int cpufreq_pid_governor_init(struct cpufreq_policy *policy)
 {
