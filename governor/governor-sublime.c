@@ -67,6 +67,7 @@ static ssize_t store_E_value(struct gov_attr_set *attr_set,
 	return count;
 }
 
+// Mejor con la macro incluyendo otro fichero
 static struct governor_attr E_value =					\
 __ATTR(E_value, 0644, show_E_value, store_E_value)
 
