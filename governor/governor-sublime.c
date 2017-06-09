@@ -5,96 +5,245 @@
 #include <linux/cpufreq.h>
 #include <linux/init.h>
 #include <linux/module.h>
+#include <linux/slab.h>
+#include "cpufreq_governor.h"
 
-static int E = -1;
-static int F = 0;
-static int A = 50000;
-static int B = -49722;
-static int C = 0;
+struct pid_dbs_tuners {
+	int E_value;
+	int F_value;
+	int A_value;
+	int B_value;
+	int C_value;
+	int temp_obj;
+};
 
 static DEFINE_MUTEX(access_variables);
 
-
-static int cpufreq_pid_governor_init(struct cpufreq_policy *policy)
+static void od_update(struct cpufreq_policy *policy)
 {
-	return 0;
-}
+	// Global variables
+	static int u1 = 0;
+	static int u2 = 0;
+	static int e1 = 0;
+	static int e2 = 0;
 
-static void cpufreq_pid_governor_exit(struct cpufreq_policy *policy)
-{
+	struct policy_dbs_info *policy_dbs = policy->governor_data;
+	struct dbs_data *dbs_data = policy_dbs->dbs_data;
+	struct pid_dbs_tuners *od_tuners = dbs_data->tuners;
 
-}
-
-static int cpufreq_pid_governor_start(struct cpufreq_policy *policy)
-{
-	return 0;
-}
-
-static void cpufreq_pid_governor_stop(struct cpufreq_policy *policy)
-{
-
-}
-
-static void cpufreq_pid_governor_limits(struct cpufreq_policy *policy)
-{
-
-}
-
-/*************sysfs*****************************************/
-
-static ssize_t show_E_value(struct gov_attr_set *attr_set, char *buf)
-{
-	int aux;
 	mutex_lock(&access_variables);
-	aux = E;
+	int E = od_tuners->E_value;
+	int F = od_tuners->F_value;
+	int A = od_tuners->A_value;
+	int B = od_tuners->B_value;
+	int C = od_tuners->C_value;
+	int error = od_tuners->temp_obj - temp_obj; // OJO!! Obtener temperatura
 	mutex_unlock(&access_variables);
-	return sprintf(buf, "%d\n", aux);
+
+	int u = -E * u1 - F * u2 + A * error + B * e1 + C * e2;
+
+	u2 = u1;
+	u1 = u;
+	e2 = e1;
+	e1 = error;
+	
+	__cpufreq_driver_target(policy, u, CPUFREQ_RELATION_C);
 }
+
+
+/************* sysfs *****************************************/
 
 static ssize_t store_E_value(struct gov_attr_set *attr_set,
 				const char *buf, size_t count)
 {
-	unsigned int input;
+	struct dbs_data *dbs_data = to_dbs_data(attr_set);
+	struct pid_dbs_tuners *pid_tuners = dbs_data->tuners;
+	int input;
 	int ret;
 	ret = sscanf(buf, "%d", &input);
 
 	if(ret == NULL) return -EINVAL;
 
 	mutex_lock(&access_variables);
-	E = input;
+	pid_tuners->E_value = input;
+	mutex_unlock(&access_variables);
+
+	return count;
+}
+
+static ssize_t store_F_value(struct gov_attr_set *attr_set,
+				const char *buf, size_t count)
+{
+	struct dbs_data *dbs_data = to_dbs_data(attr_set);
+	struct pid_dbs_tuners *pid_tuners = dbs_data->tuners;
+	int input;
+	int ret;
+	ret = sscanf(buf, "%d", &input);
+
+	if(ret == NULL) return -EINVAL;
+
+	mutex_lock(&access_variables);
+	pid_tuners->F_value = input;
+	mutex_unlock(&access_variables);
+
+	return count;
+}
+static ssize_t store_A_value(struct gov_attr_set *attr_set,
+				const char *buf, size_t count)
+{
+	struct dbs_data *dbs_data = to_dbs_data(attr_set);
+	struct pid_dbs_tuners *pid_tuners = dbs_data->tuners;
+	int input;
+	int ret;
+	ret = sscanf(buf, "%d", &input);
+
+	if(ret == NULL) return -EINVAL;
+
+	mutex_lock(&access_variables);
+	pid_tuners->A_value = input;
+	mutex_unlock(&access_variables);
+
+	return count;
+}
+
+static ssize_t store_B_value(struct gov_attr_set *attr_set,
+				const char *buf, size_t count)
+{
+	struct dbs_data *dbs_data = to_dbs_data(attr_set);
+	struct pid_dbs_tuners *pid_tuners = dbs_data->tuners;
+	int input;
+	int ret;
+	ret = sscanf(buf, "%d", &input);
+
+	if(ret == NULL) return -EINVAL;
+
+	mutex_lock(&access_variables);
+	pid_tuners->B_value = input;
+	mutex_unlock(&access_variables);
+
+	return count;
+}
+
+static ssize_t store_C_value(struct gov_attr_set *attr_set,
+				const char *buf, size_t count)
+{
+	struct dbs_data *dbs_data = to_dbs_data(attr_set);
+	struct pid_dbs_tuners *pid_tuners = dbs_data->tuners;
+	int input;
+	int ret;
+	ret = sscanf(buf, "%d", &input);
+
+	if(ret == NULL) return -EINVAL;
+
+	mutex_lock(&access_variables);
+	pid_tuners->C_value = input;
+	mutex_unlock(&access_variables);
+
+	return count;
+}
+
+static ssize_t store_temp_obj(struct gov_attr_set *attr_set,
+				const char *buf, size_t count)
+{
+	struct dbs_data *dbs_data = to_dbs_data(attr_set);
+	struct pid_dbs_tuners *pid_tuners = dbs_data->tuners;
+	int input;
+	int ret;
+	ret = sscanf(buf, "%d", &input);
+
+	if(ret == NULL) return -EINVAL;
+
+	mutex_lock(&access_variables);
+	pid_tuners->temp_obj = input;
 	mutex_unlock(&access_variables);
 
 	return count;
 }
 
 // Mejor con la macro incluyendo otro fichero
-static struct governor_attr E_value =					\
-__ATTR(E_value, 0644, show_E_value, store_E_value)
+gov_show_one(pid, E_value);
+gov_show_one(pid, F_value);
+gov_show_one(pid, A_value);
+gov_show_one(pid, B_value);
+gov_show_one(pid, C_value);
+gov_show_one(pid, temp_obj);
 
-static struct governor_attr F_value =					\
-__ATTR(F_value, 0644, show_F_value, store_F_value)
+gov_attr_rw(E_value);
+gov_attr_rw(F_value);
+gov_attr_rw(A_value);
+gov_attr_rw(B_value);
+gov_attr_rw(C_value);
+gov_attr_rw(temp_obj);
 
-static struct governor_attr A_value =					\
-__ATTR(A_value, 0644, show_A_value, store_A_value)
+static struct attribute *pid_attributes[] = {
+	&E_value.attr,
+	&F_value.attr,
+	&A_value.attr,
+	&B_value.attr,
+	&C_value.attr,
+	&temp_obj.attr,
+	NULL
+};
 
-static struct governor_attr B_value =					\
-__ATTR(B_value, 0644, show_B_value, store_B_value)
+/************* sysfs *****************************************/
 
-static struct governor_attr C_value =					\
-__ATTR(C_value, 0644, show_C_value, store_C_value)
+static struct policy_dbs_info *pid_alloc(void)
+{
+	struct od_policy_dbs_info *dbs_info;
 
-static struct governor_attr temp_obj =					\
-__ATTR(temp_obj, 0644, show_temp_obj, store_temp_obj)
+	dbs_info = kzalloc(sizeof(*dbs_info), GFP_KERNEL);
+	return dbs_info ? &dbs_info->policy_dbs : NULL;
+}
+
+static void pid_free(struct policy_dbs_info *policy_dbs)
+{
+	kfree(to_dbs_info(policy_dbs));
+}
+
+static int pid_init(struct dbs_data *dbs_data)
+{
+	struct pid_dbs_tuners *tuners;
+	u64 idle_time;
+	int cpu;
+
+	tuners = kzalloc(sizeof(*tuners), GFP_KERNEL);
+	if (!tuners)
+		return -ENOMEM;
+
+	od_tuners->E_value = -1;
+	od_tuners->F_value = 0;
+	od_tuners->A_value = 50000;
+	od_tuners->B_value = -49722;
+	od_tuners->C_value = 0;
+	od_tuners->temp_obj = 3; // OJO!! esto esta en segundos
+
+	dbs_data->tuners = tuners;
+	return 0;
+}
+
+static void pid_exit(struct dbs_data *dbs_data)
+{
+	kfree(dbs_data->tuners);
+}
+
+static void pid_start(struct cpufreq_policy *policy)
+{
+	struct od_policy_dbs_info *dbs_info = to_dbs_info(policy->governor_data);
+
+	dbs_info->sample_type = OD_NORMAL_SAMPLE;
+	ondemand_powersave_bias_init(policy);
+}
 
 
-static struct cpufreq_governor cpufreq_gov_pidgovernor = {
-	.name		= "PID_governor",
-	.init		= cpufreq_pid_governor_init,
-	.exit		= cpufreq_pid_governor_exit,
-	.start		= cpufreq_pid_governor_start,
-	.stop		= cpufreq_pid_governor_stop,
-	.limits		= cpufreq_pid_governor_limits,
-	.owner		= THIS_MODULE,
+static struct dbs_governor od_dbs_gov = {
+	.gov = CPUFREQ_DBS_GOVERNOR_INITIALIZER("PID_governor"),
+	.kobj_type = { .default_attrs = pid_attributes },
+	.gov_dbs_update = od_update,
+	.alloc = pid_alloc,
+	.free = pid_free,
+	.init = pid_init,
+	.exit = pid_exit,
+	.start = pid_start,
 };
 
 static int __init cpufreq_gov_pid_init(void)
