@@ -1,8 +1,8 @@
-%fileID = fopen('/Users/Pablo/Documents/Universidad/governor-tfg/benchmark/results/2_core_cont/state_continuous.txt','r');
-fileID = fopen('/Users/Pablo/Documents/Universidad/governor-tfg/benchmark/results/2_cores_step/state_1026000.txt','r');
+%fileID = fopen('/Users/Pablo/Documents/Universidad/governor-tfg/benchmark/results.old/2_core_cont/state_continuous.txt','r');
+fileID = fopen('/Users/Pablo/Documents/Universidad/governor-tfg/benchmark/results.old/2_cores_step/state_918000.txt','r');
 % fileID = fopen('D:/Repositorios/governor-tfg/results/Nuevo_Benchmark/1CPU/state_918000.txt','r');
 %fileID = fopen('resultados/state_continuous.txt','r');
-fileID = fopen('E:/Git_repositories/governor-tfg/results/Nuevo_Benchmark/1CPU/state_918000.txt','r');
+%fileID = fopen('E:/Git_repositories/governor-tfg/results/Nuevo_Benchmark/1CPU/state_918000.txt','r');
 
 formatSpec = '%d';
 B = fscanf(fileID, formatSpec);
@@ -16,15 +16,26 @@ F=B(2:2:end,:);
 %Para pasar a grados
 A = rdivide(A,1000);
 
-data = iddata(A,F,Ts); %pt señal de salida (temp) %ct señal de entrada (freq) %Ts intervalo entre medidas
+data = iddata(A,F,Ts) %pt señal de salida (temp) %ct señal de entrada (freq) %Ts intervalo entre medidas
 data.InputName  = '\Delta Freq';
 data.InputUnit  = 'KHz';
 data.OutputName = '\Delta PTemp';
 data.OutputUnit = 'C';
 data.TimeUnit   = 'seconds';
-plot(data)
 
+set(0,'defaultlinelinewidth',1.5)
 
+figure(1);
+%plot(data, 'LineWidth', 1.5, 'MarkerSize', 8, 'FontSize', 8);
+opt = iddataPlotOptions('time');
+opt.TimeUnits = 'seconds';
+opt.Grid = 'on';
+
+h = plot(data,opt)
+%get(h)
+xlabel('Tiempo');
+title('');
+figure(2);
 %% Transfer Function Estimation
 %
 % From the physics of the problem we know that the heat exchanger can be
@@ -39,9 +50,9 @@ sysTF = tfest(data,1,0,nan);
 set(gcf,'DefaultAxesTitleFontSizeMultiplier',1,...
    'DefaultAxesTitleFontWeight','normal',...
    'Position',[100 100 780 520]);
-resid(sysTF,data);
+%resid(sysTF,data);
 %%
-clf
+%clf
 %compare(data,sysTF)
 %%
 % The figure shows that residuals are strongly correlated implying there is
@@ -77,9 +88,9 @@ sysInit.Structure.ioDelay.Maximum = 1;
 % Use the system as an initial guess for the estimation problem
 sysTF_initialized = tfest(data,sysInit)
 %%
-resid(sysTF_initialized,data);
+%resid(sysTF_initialized,data);
 %%
-clf
+%clf
 %compare(data,sysTF,sysTF_initialized)
 
 %% Process Model Estimation
@@ -96,9 +107,9 @@ clf
 
 sysP1D  = procest(data,'P1D')
 %%
-resid(sysP1D,data);
+%resid(sysP1D,data);
 %%
-clf
+%clf
 %compare(data,sysTF,sysTF_initialized,sysP1D)
 
 %% Process Model Estimation with Disturbance Model
@@ -137,13 +148,15 @@ resid(sysP1D_noise,data);
 %%
 clf
 %compare(data,sysTF,sysTF_initialized,sysP1D,sysP1D_noise);
+figure(3);
 compare(data,sysP1D_noise);
+%set(i, 'LineWidth', 1.5);
 %%
 % The residual plot clearly shows that the residuals are uncorrelated
 % implying that we have a model that explains the measured data. The
 % 'ARMA1' disturbance component we estimated is stored as numerator and
 % denominator values in the "NoiseTF" property of the model.
-sysP1D_noise.NoiseTF;
+sysP1D_noise.NoiseTF
 
 %% Compare Different Models
 %
