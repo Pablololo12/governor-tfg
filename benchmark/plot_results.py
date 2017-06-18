@@ -3,9 +3,24 @@ import re
 import numpy as np
 import matplotlib.pyplot as plt
 
-if len(sys.argv) != 4:
+if len(sys.argv) != 7:
 	print('Error in arguments')
 	sys.exit(0)
+
+# temperaturas
+# error
+# benchmark
+# temp obj
+# ruta guardado
+# extension del nombre
+
+font = {'family' : 'normal',
+        'weight' : 'bold',
+        'size'   : 18}
+
+plt.rc('font', **font)
+plt.rc('lines', linewidth=4)
+
 
 # First we draw the temp plot
 file_temp = open(sys.argv[1], 'r')
@@ -44,8 +59,6 @@ def f_freq(x):
 	return freq_values[x]
 
 
-
-
 #Error file
 file_error = open(sys.argv[2], 'r')
 
@@ -82,33 +95,39 @@ def f_thu(x):
 	return theoric_u[x]
 
 # Show Temperature and frequency in the same plot
-fig, ax1 = plt.subplots()
-plt.title('Real Freq - Theoric Freq')
-ax1.set_xlabel('Time')
-ax1.plot(x,f_thu(x),'b')
-ax1.set_ylabel('Freq Real (MHz)', color='b')
+#plt.tight_layout()
 
+plt.figure(1)
+plt.title('Freq Teorica y Discreta')
+plt.xlabel('Tiempo')
+plt.plot(x,f_thu(x),'b')
+plt.ylabel('Freq Real (MHz)', color='b')
+plt.plot(x,f_freq(x),'g')
+plt.xlim([0,size_temp])
+plt.tight_layout()
 
-ax2 = ax1.twinx()
-ax2.plot(x,f_freq(x),'g')
-ax2.set_ylabel('Freq U (MHz)', color='g')
-ax2.set_ylim(ax1.get_ylim())
-
-fig.tight_layout()
+plt.savefig(sys.argv[5]+"/freq_"+sys.argv[6]+".pdf", format="pdf")
 
 # Show only the temperature
 plt.figure(2)
-plt.title('Temperature')
+plt.title('Temperatura')
+plt.plot([0, size_temp], [sys.argv[4], sys.argv[4]], '--')
 plt.plot(x,f_temp(x),'r')
-plt.xlabel('Time')
+plt.xlabel('Tiempo')
 plt.ylabel('Temp (C)')
+plt.xlim([0,size_temp])
+plt.tight_layout()
+plt.savefig(sys.argv[5]+"/temp_"+sys.argv[6]+".pdf", format="pdf")
 
-# Show only the temperature
+# Show only the error
 plt.figure(3)
 plt.title('Error')
 plt.plot(x,f_error(x),'r')
-plt.xlabel('Time')
+plt.xlabel('Tiempo')
 plt.ylabel('Temp (C)')
+plt.xlim([0,size_error])
+plt.tight_layout()
+plt.savefig(sys.argv[5]+"/error_"+sys.argv[6]+".pdf", format="pdf")
 '''
 # Show Temperature and frequency in the same plot
 fig2, ax3= plt.subplots()
@@ -156,10 +175,13 @@ plt.ylabel('Time spent (seconds)')
 plt.xlabel('Iteration')
 '''
 plt.figure(4)
-plt.title('Benchmark results (Mflops)')
+plt.title('Resultados Benchmark (Mflops)')
 plt.bar(y_pos, flops_values, align='center', alpha=0.5)
 plt.xticks(y_pos,iter_values)
 plt.ylabel('Mflops')
-plt.xlabel('Iteration')
+plt.xlabel('Iteracion')
+plt.xlim([-1,len(iter_values)])
+plt.tight_layout()
+plt.savefig(sys.argv[5]+"/bench_"+sys.argv[6]+".pdf", format="pdf")
 
-plt.show()
+#plt.show()
