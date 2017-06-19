@@ -210,18 +210,19 @@ static struct attribute *pid_attributes[] = {
 
 /************* sysfs *****************************************/
 
-/*static struct policy_dbs_info *pid_alloc(void)
+static struct policy_dbs_info *pid_alloc(void)
 {
-	struct od_policy_dbs_info *dbs_info;
+	//struct od_policy_dbs_info *dbs_info;
 
-	dbs_info = kzalloc(sizeof(*dbs_info), GFP_KERNEL);
-	return dbs_info ? &dbs_info->policy_dbs : NULL;
+	//dbs_info = kzalloc(sizeof(*dbs_info), GFP_KERNEL);
+	//return dbs_info ? &dbs_info->policy_dbs : NULL;
+	return NULL;
 }
 
 static void pid_free(struct policy_dbs_info *policy_dbs)
 {
-	kfree(to_dbs_info(policy_dbs));
-}*/
+	//kfree(to_dbs_info(policy_dbs));
+}
 
 static int pid_init(struct dbs_data *dbs_data)
 {
@@ -262,8 +263,8 @@ static struct dbs_governor pid_dbs_gov = {
 	.gov = CPUFREQ_DBS_GOVERNOR_INITIALIZER("PID_governor"),
 	.kobj_type = { .default_attrs = pid_attributes },
 	.gov_dbs_update = pid_update,
-	//.alloc = pid_alloc,
-	//.free = pid_free,
+	.alloc = pid_alloc,
+	.free = pid_free,
 	.init = pid_init,
 	.exit = pid_exit,
 	.start = pid_start,
@@ -289,7 +290,7 @@ static void __exit cpufreq_gov_pid_exit(void)
 }
 
 MODULE_AUTHOR("Pablo Hernandez <pabloheralm@gmail.com>");
-MODULE_DESCRIPTION("'PID_governor' - A PID governor to keep
+MODULE_DESCRIPTION("PID_governor - A PID governor to keep
 	the same temperature");
 MODULE_LICENSE("GPL");
 
