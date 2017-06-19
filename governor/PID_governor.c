@@ -290,8 +290,8 @@ static void __exit cpufreq_gov_pid_exit(void)
 }
 
 MODULE_AUTHOR("Pablo Hernandez <pabloheralm@gmail.com>");
-MODULE_DESCRIPTION("PID_governor - A PID governor to keep
-	the same temperature");
+MODULE_DESCRIPTION("PID_governor - A PID governor to keep"
+	"the same temperature");
 MODULE_LICENSE("GPL");
 
 #ifdef CONFIG_CPU_FREQ_DEFAULT_GOV_PIDGOV
