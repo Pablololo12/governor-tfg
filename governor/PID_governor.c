@@ -276,7 +276,7 @@ gov_sys_pol_attr_rw(temp_obj);
 
 
 static struct attribute *dbs_attributes_gov_sys[] = {
-	&sampling_rate_gov_sys_gov_sys.attr,
+	&sampling_rate_gov_sys.attr,
 	&E_value_gov_sys.attr,
 	&F_value_gov_sys.attr,
 	&A_value_gov_sys.attr,
