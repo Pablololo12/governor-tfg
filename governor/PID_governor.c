@@ -25,7 +25,7 @@ static int temp=0;
 
 static DEFINE_PER_CPU(struct od_cpu_dbs_info_s, od_cpu_dbs_info);
 
-static struct od_ops od_ops;
+//static struct od_ops od_ops;
 
 struct pid_dbs_tuners {
 	unsigned int sampling_rate;
@@ -77,13 +77,14 @@ static int update_temp(struct thermal_zone_device *tz, int trip)
  * (default), then we try to increase frequency. Else, we adjust the frequency
  * proportional to load.
  */
-static void pid_update(int cpu, unsigned int load)
+static void pid_update(int cpu)
 {
 	// Global variables
 	static int u1 = 0;
 	static int u2 = 0;
 	static int e1 = 0;
 	static int e2 = 0;
+	int E, F, A, B, C, error, u;
 
 	struct od_cpu_dbs_info_s *dbs_info = &per_cpu(od_cpu_dbs_info, cpu);
 	struct cpufreq_policy *policy = dbs_info->cdbs.shared->policy;
@@ -96,16 +97,15 @@ static void pid_update(int cpu, unsigned int load)
 	mutex_unlock(&access_temp);
 
 	mutex_lock(&access_variables);
-	int E = pid_tuners->E_value;
-	int F = pid_tuners->F_value;
-	int A = pid_tuners->A_value;
-	int B = pid_tuners->B_value;
-	int C = pid_tuners->C_value;
-	int error = pid_tuners->temp_obj - temp_ac; // OJO!! Obtener temperatura
-	unsigned int sampling = dbs_data->sampling_rate;
+	E = pid_tuners->E_value;
+	F = pid_tuners->F_value;
+	A = pid_tuners->A_value;
+	B = pid_tuners->B_value;
+	C = pid_tuners->C_value;
+	error = pid_tuners->temp_obj - temp_ac; // OJO!! Obtener temperatura
 	mutex_unlock(&access_variables);
 
-	int u = -E * u1 - F * u2 + A * error + B * e1 + C * e2;
+	u = -E * u1 - F * u2 + A * error + B * e1 + C * e2;
 
 	u2 = u1;
 	u1 = u;
@@ -128,7 +128,7 @@ static unsigned int pid_dbs_timer(struct cpu_dbs_info *cdbs,
 	if (!modify_all)
 		goto max_delay;
 
-	pid_update(dbs_data, cpu);
+	pid_update(cpu);
 
 max_delay:
 	if (!delay)
@@ -164,7 +164,7 @@ static ssize_t store_E_value(struct dbs_data *dbs_data, const char *buf,
 	int ret;
 	ret = sscanf(buf, "%d", &input);
 
-	if(ret == NULL) return -EINVAL;
+	if(ret != 1) return -EINVAL;
 
 	mutex_lock(&access_variables);
 	pid_tuners->E_value = input;
@@ -181,7 +181,7 @@ static ssize_t store_F_value(struct dbs_data *dbs_data, const char *buf,
 	int ret;
 	ret = sscanf(buf, "%d", &input);
 
-	if(ret == NULL) return -EINVAL;
+	if(ret != 1) return -EINVAL;
 
 	mutex_lock(&access_variables);
 	pid_tuners->F_value = input;
@@ -197,7 +197,7 @@ static ssize_t store_A_value(struct dbs_data *dbs_data, const char *buf,
 	int ret;
 	ret = sscanf(buf, "%d", &input);
 
-	if(ret == NULL) return -EINVAL;
+	if(ret != 1) return -EINVAL;
 
 	mutex_lock(&access_variables);
 	pid_tuners->A_value = input;
@@ -214,7 +214,7 @@ static ssize_t store_B_value(struct dbs_data *dbs_data, const char *buf,
 	int ret;
 	ret = sscanf(buf, "%d", &input);
 
-	if(ret == NULL) return -EINVAL;
+	if(ret != 1) return -EINVAL;
 
 	mutex_lock(&access_variables);
 	pid_tuners->B_value = input;
@@ -231,7 +231,7 @@ static ssize_t store_C_value(struct dbs_data *dbs_data, const char *buf,
 	int ret;
 	ret = sscanf(buf, "%d", &input);
 
-	if(ret == NULL) return -EINVAL;
+	if(ret != 1) return -EINVAL;
 
 	mutex_lock(&access_variables);
 	pid_tuners->C_value = input;
@@ -248,7 +248,7 @@ static ssize_t store_temp_obj(struct dbs_data *dbs_data, const char *buf,
 	int ret;
 	ret = sscanf(buf, "%d", &input);
 
-	if(ret == NULL) return -EINVAL;
+	if(ret != 1) return -EINVAL;
 
 	mutex_lock(&access_variables);
 	pid_tuners->temp_obj = input;
@@ -276,13 +276,13 @@ gov_sys_pol_attr_rw(temp_obj);
 
 
 static struct attribute *dbs_attributes_gov_sys[] = {
-	&sampling_rate.attr,
-	&E_value.attr,
-	&F_value.attr,
-	&A_value.attr,
-	&B_value.attr,
-	&C_value.attr,
-	&temp_obj.attr,
+	&sampling_rate_gov_sys_gov_sys.attr,
+	&E_value_gov_sys.attr,
+	&F_value_gov_sys.attr,
+	&A_value_gov_sys.attr,
+	&B_value_gov_sys.attr,
+	&C_value_gov_sys.attr,
+	&temp_obj_gov_sys.attr,
 	NULL
 };
 
@@ -292,13 +292,13 @@ static struct attribute_group pid_attr_group_gov_sys = {
 };
 
 static struct attribute *dbs_attributes_gov_pol[] = {
-	&sampling_rate.attr,
-	&E_value.attr,
-	&F_value.attr,
-	&A_value.attr,
-	&B_value.attr,
-	&C_value.attr,
-	&temp_obj.attr,
+	&sampling_rate_gov_pol.attr,
+	&E_value_gov_pol.attr,
+	&F_value_gov_pol.attr,
+	&A_value_gov_pol.attr,
+	&B_value_gov_pol.attr,
+	&C_value_gov_pol.attr,
+	&temp_obj_gov_pol.attr,
 	NULL
 };
 
@@ -309,7 +309,7 @@ static struct attribute_group pid_attr_group_gov_pol = {
 
 /************************** sysfs end ************************/
 
-static int od_init(struct dbs_data *dbs_data, bool notify)
+static int pid_init(struct dbs_data *dbs_data, bool notify)
 {
 	struct pid_dbs_tuners *tuners;
 	u64 idle_time;
@@ -333,19 +333,20 @@ static int od_init(struct dbs_data *dbs_data, bool notify)
 	return 0;
 }
 
-static void od_exit(struct dbs_data *dbs_data, bool notify)
+static void pid_exit(struct dbs_data *dbs_data, bool notify)
 {
 	kfree(dbs_data->tuners);
 }
 
 define_get_cpu_dbs_routines(od_cpu_dbs_info);
 
-static struct od_ops od_ops = {
-	.powersave_bias_init_cpu = ondemand_powersave_bias_init_cpu,
+/*static struct od_ops od_ops = {
+	//.powersave_bias_init_cpu = ondemand_powersave_bias_init_cpu,
 	.powersave_bias_target = generic_powersave_bias_target,
 	.freq_increase = dbs_freq_increase,
-};
+};*/
 
+#define PID_GOVERNOR		2
 static struct common_dbs_data pid_dbs_cdata = {
 	.governor = PID_GOVERNOR,
 	.attr_group_gov_sys = &pid_attr_group_gov_sys,
@@ -363,7 +364,6 @@ static struct common_dbs_data pid_dbs_cdata = {
 static int pid_cpufreq_governor_dbs(struct cpufreq_policy *policy,
 		unsigned int event)
 {
-	if(thermal_register_governor(&thermal_gov_user_space)) return 0;
 	return cpufreq_governor_dbs(policy, &pid_dbs_cdata, event);
 }
 
@@ -383,6 +383,7 @@ static struct thermal_governor thermal_gov_user_space = {
 
 static int __init cpufreq_gov_dbs_init(void)
 {
+	if(thermal_register_governor(&thermal_gov_user_space)) return 0;
 	return cpufreq_register_governor(&cpufreq_gov_pid);
 }
 
