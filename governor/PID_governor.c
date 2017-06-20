@@ -340,11 +340,11 @@ static void pid_exit(struct dbs_data *dbs_data, bool notify)
 
 define_get_cpu_dbs_routines(od_cpu_dbs_info);
 
-/*static struct od_ops od_ops = {
-	//.powersave_bias_init_cpu = ondemand_powersave_bias_init_cpu,
-	.powersave_bias_target = generic_powersave_bias_target,
-	.freq_increase = dbs_freq_increase,
-};*/
+static struct od_ops od_ops = {
+	.powersave_bias_init_cpu = NULL,
+	.powersave_bias_target = NULL,
+	.freq_increase = NULL,
+};
 
 #define PID_GOVERNOR		2
 static struct common_dbs_data pid_dbs_cdata = {
@@ -355,7 +355,7 @@ static struct common_dbs_data pid_dbs_cdata = {
 	.get_cpu_dbs_info_s = get_cpu_dbs_info_s,
 	.gov_dbs_timer = pid_dbs_timer,
 	.gov_check_cpu = NULL,
-	.gov_ops = NULL,
+	.gov_ops = &od_ops,
 	.init = pid_init,
 	.exit = pid_exit,
 	.mutex = __MUTEX_INITIALIZER(pid_dbs_cdata.mutex),
