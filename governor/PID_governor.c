@@ -229,7 +229,7 @@ static int pid_init(struct dbs_data *dbs_data)
 	u64 idle_time;
 	int cpu;
 
-	tuners = kzalloc(sizeof(*pid_dbs_tuners), GFP_KERNEL);
+	tuners = kzalloc(sizeof(*tuners), GFP_KERNEL);
 	if (!tuners)
 		return -ENOMEM;
 
