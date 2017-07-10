@@ -12,8 +12,8 @@
 #include <linux/tick.h>
 #include <linux/ktime.h>
 #include <linux/sched.h>
-#include <linux/thermal.h>
 #include <linux/workqueue.h>
+#include <linux/thermal.h>
 #include "../thermal/thermal_core.h"
 
 /* PID_governor macros */
