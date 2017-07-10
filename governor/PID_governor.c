@@ -25,10 +25,10 @@
 #define DEF_SAMPLING_VALUE		(3000000)
 
 struct cpu_dbs_info_s {
-	int error1 = 0;
-	int error2 = 0;
-	int u1 = 0;
-	int u2 = 0;
+	int error1;
+	int error2;
+	int u1;
+	int u2;
 	struct cpufreq_policy *cur_policy;
 	struct delayed_work work;
 	unsigned int requested_freq;
