@@ -13,6 +13,7 @@
 #include <linux/ktime.h>
 #include <linux/sched.h>
 #include <linux/thermal.h>
+#include <linux/workqueue.h>
 #include "../thermal/thermal_core.h"
 
 /* PID_governor macros */
@@ -294,7 +295,7 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 
 	policy = this_dbs_info->cur_policy;
 
-	int temp_ac=0;
+	int temp_ac;
 	mutex_lock(&access_temp);
 	temp_ac=temp;
 	mutex_unlock(&access_temp);
@@ -404,7 +405,7 @@ static
 #endif
 struct cpufreq_governor cpufreq_gov_pid = {
 	.name			= "PID_GOVERNOR",
-	.governor		= pid_cpufreq_governor_dbs,
+	.governor		= cpufreq_governor_dbs,
 	.owner			= THIS_MODULE,
 };
 
