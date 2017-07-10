@@ -71,6 +71,7 @@ static struct dbs_tuners {
 
 static DEFINE_MUTEX(access_temp);
 static int temp=0; // TODO: Ponerla en otro lado
+static unsigned int dbs_enable;	/* number of CPUs using this policy */
 
 static int update_temp(struct thermal_zone_device *tz, int trip)
 {
@@ -80,6 +81,8 @@ static int update_temp(struct thermal_zone_device *tz, int trip)
 	return 0;
 }
 
+static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info);
+
 /**************** A little bit of magic ****************/
 
 /******************* Working queues *******************/
@@ -87,13 +90,14 @@ static int update_temp(struct thermal_zone_device *tz, int trip)
 
 static void do_dbs_timer(struct work_struct *work)
 {
+	int delay;
 	struct cpu_dbs_info_s *dbs_info =
 		container_of(work, struct cpu_dbs_info_s, work.work);
 	unsigned int cpu = dbs_info->cpu;
 
 	/* We want all CPUs to do sampling nearly on same jiffy */
 	mutex_lock(&dbs_mutex);
-	int delay = usecs_to_jiffies(dbs_tuners_ins.sampling_rate);
+	delay = usecs_to_jiffies(dbs_tuners_ins.sampling_rate);
 	mutex_unlock(&dbs_mutex);
 
 	delay -= jiffies % delay;
@@ -265,26 +269,22 @@ define_one_global_rw(C_value);
 define_one_global_rw(temp_obj);
 
 static struct attribute *dbs_attributes[] = {
-	&sampling_rate_gov_pol.attr,
-	&E_value_gov_pol.attr,
-	&F_value_gov_pol.attr,
-	&A_value_gov_pol.attr,
-	&B_value_gov_pol.attr,
-	&C_value_gov_pol.attr,
-	&temp_obj_gov_pol.attr,
+	&sampling_rate.attr,
+	&E_value.attr,
+	&F_value.attr,
+	&A_value.attr,
+	&B_value.attr,
+	&C_value.attr,
+	&temp_obj.attr,
 	NULL
 };
 
-static struct attribute_group pid_attr_group = {
+static struct attribute_group dbs_attr_group = {
 	.attrs = dbs_attributes,
 	.name = "PID_governor",
 };
 
 /********************* end sysfs ******************************/
-
-static struct notifier_block dbs_cpufreq_notifier_block = {
-	.notifier_call = dbs_cpufreq_notifier
-};
 
 /********************* PID como tal *********************/
 static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
@@ -373,9 +373,6 @@ static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 				return rc;
 			}
 
-			cpufreq_register_notifier(
-					&dbs_cpufreq_notifier_block,
-					CPUFREQ_TRANSITION_NOTIFIER);
 		}
 		mutex_unlock(&dbs_mutex);
 
@@ -390,14 +387,6 @@ static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 		dbs_enable--;
 		mutex_destroy(&this_dbs_info->timer_mutex);
 
-		/*
-		 * Stop the timerschedule work, when this governor
-		 * is used for first time
-		 */
-		if (dbs_enable == 0)
-			cpufreq_unregister_notifier(
-					&dbs_cpufreq_notifier_block,
-					CPUFREQ_TRANSITION_NOTIFIER);
 
 		mutex_unlock(&dbs_mutex);
 		if (!dbs_enable)
