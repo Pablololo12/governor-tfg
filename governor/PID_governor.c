@@ -321,6 +321,8 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 	e2 = e1;
 	e1 = error;
 
+	printk("Temp: %d Freq: %d\n", temp_ac, u);
+
 	this_dbs_info->error1 = e1;
 	this_dbs_info->error2 = e2;
 	this_dbs_info->u1 = u1;
