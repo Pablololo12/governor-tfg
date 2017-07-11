@@ -14,16 +14,15 @@
 #include <linux/sched.h>
 #include <linux/workqueue.h>
 #include <linux/thermal.h>
-#include "../thermal/thermal_core.h"
 
 /* PID_governor macros */
-#define DEF_E_VALUE		(-1)
-#define DEF_F_VALUE		(0)
-#define DEF_A_VALUE		(50000)
-#define DEF_B_VALUE		(-49722)
-#define DEF_C_VALUE		(0)
-#define DEF_TEMP_OBJ		(85000)
-#define DEF_SAMPLING_VALUE		(3000000)
+#define DEF_E_VALUE                 (-1)
+#define DEF_F_VALUE                  (0)
+#define DEF_A_VALUE              (50000)
+#define DEF_B_VALUE             (-49722)
+#define DEF_C_VALUE                  (0)
+#define DEF_TEMP_OBJ             (85000)
+#define DEF_SAMPLING_VALUE     (3000000)
 
 struct cpu_dbs_info_s {
 	int error1;
@@ -35,12 +34,6 @@ struct cpu_dbs_info_s {
 	unsigned int requested_freq;
 	int cpu;
 	unsigned int enable:1;
-	/*
-	 * percpu mutex that serializes governor limit change with
-	 * do_dbs_timer invocation. We do not want do_dbs_timer to run
-	 * when user is changing the governor or limits.
-	 */
-	struct mutex timer_mutex;
 };
 static DEFINE_PER_CPU(struct cpu_dbs_info_s, cs_cpu_dbs_info);
 
@@ -67,20 +60,9 @@ static struct dbs_tuners {
 	.temp_obj = DEF_TEMP_OBJ,
 };
 
-
-/********** Pray to work ************/
-
-static DEFINE_MUTEX(access_temp);
-static int temp=0; // TODO: Ponerla en otro lado
+static struct thermal_zone_device *tz; // TODO: Ponerla en otro lado
 static unsigned int dbs_enable;	/* number of CPUs using this policy */
 
-static int update_temp(struct thermal_zone_device *tz, int trip)
-{
-	mutex_lock(&access_temp);
-	temp=tz->temperature;
-	mutex_unlock(&access_temp);
-	return 0;
-}
 
 static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info);
 
@@ -103,12 +85,9 @@ static void do_dbs_timer(struct work_struct *work)
 
 	delay -= jiffies % delay;
 
-	mutex_lock(&dbs_info->timer_mutex);
-
 	dbs_check_cpu(dbs_info);
 
 	schedule_delayed_work_on(cpu, &dbs_info->work, delay);
-	mutex_unlock(&dbs_info->timer_mutex);
 }
 
 static inline void dbs_timer_init(struct cpu_dbs_info_s *dbs_info)
@@ -133,7 +112,7 @@ static inline void dbs_timer_exit(struct cpu_dbs_info_s *dbs_info)
 
 
 /************************** sysfs interface ************************/
-/* cpufreq_conservative Governor Tunables */
+
 #define show_one(file_name, object)					\
 static ssize_t show_##file_name						\
 (struct kobject *kobj, struct attribute *attr, char *buf)		\
@@ -296,9 +275,8 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 	policy = this_dbs_info->cur_policy;
 
 	int temp_ac;
-	mutex_lock(&access_temp);
-	temp_ac=temp;
-	mutex_unlock(&access_temp);
+	
+	thermal_zone_get_temp(tz, &temp_ac);
 
 	e1 = this_dbs_info->error1;
 	e2 = this_dbs_info->error2;
@@ -356,7 +334,6 @@ static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 			j_dbs_info->cur_policy = policy;
 		}
 
-		mutex_init(&this_dbs_info->timer_mutex);
 		dbs_enable++;
 		/*
 		 * Start the timerschedule work, when this governor
@@ -388,7 +365,6 @@ static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 
 		mutex_lock(&dbs_mutex);
 		dbs_enable--;
-		mutex_destroy(&this_dbs_info->timer_mutex);
 
 
 		mutex_unlock(&dbs_mutex);
@@ -411,20 +387,16 @@ struct cpufreq_governor cpufreq_gov_pid = {
 	.owner			= THIS_MODULE,
 };
 
-static struct thermal_governor thermal_gov_user_space = {
-	.name		= "user_space",
-	.throttle	= update_temp,
-};
-
 static int __init cpufreq_gov_dbs_init(void)
 {
-	if(thermal_register_governor(&thermal_gov_user_space)) return 0;
+	const char *name = "cpu-thermal0";
+	tz = thermal_zone_get_zone_by_name(name);
+	if (tz == NULL) return 0;
 	return cpufreq_register_governor(&cpufreq_gov_pid);
 }
 
 static void __exit cpufreq_gov_dbs_exit(void)
 {
-	thermal_unregister_governor(&thermal_gov_user_space);
 	cpufreq_unregister_governor(&cpufreq_gov_pid);
 }
 
