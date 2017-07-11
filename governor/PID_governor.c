@@ -24,6 +24,9 @@
 #define DEF_TEMP_OBJ             (85000)
 #define DEF_SAMPLING_VALUE     (3000000)
 
+/*
+ * Struct of data for each CPU
+ */
 struct cpu_dbs_info_s {
 	int error1;
 	int error2;
@@ -37,9 +40,10 @@ struct cpu_dbs_info_s {
 };
 static DEFINE_PER_CPU(struct cpu_dbs_info_s, cs_cpu_dbs_info);
 
-/*
- * dbs_mutex protects dbs_enable in governor start/stop.
- */
+
+/****** Global data *******/
+
+// dbs_mutex to protect data access.
 static DEFINE_MUTEX(dbs_mutex);
 
 static struct dbs_tuners {
@@ -60,17 +64,54 @@ static struct dbs_tuners {
 	.temp_obj = DEF_TEMP_OBJ,
 };
 
-static struct thermal_zone_device *tz; // TODO: Ponerla en otro lado
-static unsigned int dbs_enable;	/* number of CPUs using this policy */
+static struct thermal_zone_device *tz; 
+static unsigned int dbs_enable;
 
 
-static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info);
+/********************* PID controler *********************/
+static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
+{
+	int E, F, A, B, C, error, u, e1, e2, u1, u2;
+	struct cpufreq_policy *policy;
+	int temp_ac;
 
-/**************** A little bit of magic ****************/
+	policy = this_dbs_info->cur_policy;
+	
+	thermal_zone_get_temp(tz, &temp_ac);
+
+	e1 = this_dbs_info->error1;
+	e2 = this_dbs_info->error2;
+	u1 = this_dbs_info->u1;
+	u2 = this_dbs_info->u2;
+
+	mutex_lock(&dbs_mutex);
+	E = dbs_tuners_ins.E_value;
+	F = dbs_tuners_ins.F_value;
+	A = dbs_tuners_ins.A_value;
+	B = dbs_tuners_ins.B_value;
+	C = dbs_tuners_ins.C_value;
+	error = dbs_tuners_ins.temp_obj - temp_ac; // OJO!! Obtener temperatura
+	mutex_unlock(&dbs_mutex);
+
+	u = -E * u1 - F * u2 + A * error + B * e1 + C * e2;
+
+	u2 = u1;
+	u1 = u;
+	e2 = e1;
+	e1 = error;
+
+	printk("Temp: %d Freq: %d\n", temp_ac, u);
+
+	this_dbs_info->error1 = e1;
+	this_dbs_info->error2 = e2;
+	this_dbs_info->u1 = u1;
+	this_dbs_info->u2 = u2;
+	
+	__cpufreq_driver_target(policy, u, CPUFREQ_RELATION_C);
+}
+
 
 /******************* Working queues *******************/
-/* TODO: Explain this */
-
 static void do_dbs_timer(struct work_struct *work)
 {
 	int delay;
@@ -106,9 +147,6 @@ static inline void dbs_timer_exit(struct cpu_dbs_info_s *dbs_info)
 	dbs_info->enable = 0;
 	cancel_delayed_work_sync(&dbs_info->work);
 }
-
-/**************** End of magic ****************/
-
 
 
 /************************** sysfs interface ************************/
@@ -266,50 +304,7 @@ static struct attribute_group dbs_attr_group = {
 
 /********************* end sysfs ******************************/
 
-/********************* PID como tal *********************/
-static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
-{
-	int E, F, A, B, C, error, u, e1, e2, u1, u2;
-	struct cpufreq_policy *policy;
-
-	policy = this_dbs_info->cur_policy;
-
-	int temp_ac;
-	
-	thermal_zone_get_temp(tz, &temp_ac);
-
-	e1 = this_dbs_info->error1;
-	e2 = this_dbs_info->error2;
-	u1 = this_dbs_info->u1;
-	u2 = this_dbs_info->u2;
-
-	mutex_lock(&dbs_mutex);
-	E = dbs_tuners_ins.E_value;
-	F = dbs_tuners_ins.F_value;
-	A = dbs_tuners_ins.A_value;
-	B = dbs_tuners_ins.B_value;
-	C = dbs_tuners_ins.C_value;
-	error = dbs_tuners_ins.temp_obj - temp_ac; // OJO!! Obtener temperatura
-	mutex_unlock(&dbs_mutex);
-
-	u = -E * u1 - F * u2 + A * error + B * e1 + C * e2;
-
-	u2 = u1;
-	u1 = u;
-	e2 = e1;
-	e1 = error;
-
-	printk("Temp: %d Freq: %d\n", temp_ac, u);
-
-	this_dbs_info->error1 = e1;
-	this_dbs_info->error2 = e2;
-	this_dbs_info->u1 = u1;
-	this_dbs_info->u2 = u2;
-	
-	__cpufreq_driver_target(policy, u, CPUFREQ_RELATION_C);
-}
-
-/**************** Inicializacion del governor *****************/
+/**************** Governor *****************/
 
 static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 				   unsigned int event)
@@ -340,12 +335,6 @@ static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 		 * is used for first time
 		 */
 		if (dbs_enable == 1) {
-			unsigned int latency;
-			/* policy latency is in nS. Convert it to uS first */
-			latency = policy->cpuinfo.transition_latency / 1000;
-			if (latency == 0)
-				latency = 1;
-
 			rc = sysfs_create_group(cpufreq_global_kobject,
 						&dbs_attr_group);
 			if (rc) {
