@@ -14,7 +14,7 @@
 #include <linux/sched.h>
 #include <linux/workqueue.h>
 #include <linux/thermal.h>
-#include <limits.h>
+#include <linux/limits.h>
 
 /* PID_governor macros */
 #define DEF_E_VALUE                 (-1)
