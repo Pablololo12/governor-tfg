@@ -101,15 +101,18 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 	acum += C * e2;
 
 	// Check for overflow
-	if ( acum < INT_MIN ) {
-		u = INT_MIN;
-	} else if ( acum > INT_MAX ) {
-		u = INT_MAX;
+	if ( acum <= INT_MIN ) {
+		u = INT_MIN + 1;
+		printk("Down Overflow");
+	} else if ( acum >= INT_MAX ) {
+		u = INT_MAX - 1;
+		printk("Up Overflow");
 	} else {
+		printk("%lld", acum);
 		u = (int) acum;
 	}
 
-	printk("Temp: %d Freq: %d\n", temp_ac, u);
+	printk("Error: %d Freq: %d\n", error, u);
 
 	this_dbs_info->error1 = error;
 	this_dbs_info->error2 = e1;
