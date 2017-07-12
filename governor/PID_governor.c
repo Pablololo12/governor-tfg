@@ -73,7 +73,7 @@ static unsigned int dbs_enable;
 static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 {
 	int E, F, A, B, C, error, u, e1, e2, u1, u2, temp_ac;
-	long acum;
+	long long int acum;
 	struct cpufreq_policy *policy;
 
 	policy = this_dbs_info->cur_policy;
