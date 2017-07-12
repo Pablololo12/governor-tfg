@@ -14,6 +14,7 @@
 #include <linux/sched.h>
 #include <linux/workqueue.h>
 #include <linux/thermal.h>
+#include <limits.h>
 
 /* PID_governor macros */
 #define DEF_E_VALUE                 (-1)
@@ -71,9 +72,9 @@ static unsigned int dbs_enable;
 /********************* PID controler *********************/
 static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 {
-	int E, F, A, B, C, error, u, e1, e2, u1, u2;
+	int E, F, A, B, C, error, u, e1, e2, u1, u2, temp_ac;
+	long acum;
 	struct cpufreq_policy *policy;
-	int temp_ac;
 
 	policy = this_dbs_info->cur_policy;
 	
@@ -90,22 +91,30 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 	A = dbs_tuners_ins.A_value;
 	B = dbs_tuners_ins.B_value;
 	C = dbs_tuners_ins.C_value;
-	error = dbs_tuners_ins.temp_obj - temp_ac; // OJO!! Obtener temperatura
+	error = dbs_tuners_ins.temp_obj - temp_ac;
 	mutex_unlock(&dbs_mutex);
 
-	u = -E * u1 - F * u2 + A * error + B * e1 + C * e2;
+	acum = -E * u1;
+	acum += -F * u2;
+	acum += A * error;
+	acum += B * e1;
+	acum += C * e2;
 
-	u2 = u1;
-	u1 = u;
-	e2 = e1;
-	e1 = error;
+	// Check for overflow
+	if ( acum < INT_MIN ) {
+		u = INT_MIN;
+	} else if ( acum > INT_MAX ) {
+		u = INT_MAX;
+	} else {
+		u = (int) acum;
+	}
 
 	printk("Temp: %d Freq: %d\n", temp_ac, u);
 
-	this_dbs_info->error1 = e1;
-	this_dbs_info->error2 = e2;
-	this_dbs_info->u1 = u1;
-	this_dbs_info->u2 = u2;
+	this_dbs_info->error1 = error;
+	this_dbs_info->error2 = e1;
+	this_dbs_info->u1 = u;
+	this_dbs_info->u2 = u1;
 	
 	__cpufreq_driver_target(policy, u, CPUFREQ_RELATION_C);
 }
@@ -327,6 +336,10 @@ static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 			struct cpu_dbs_info_s *j_dbs_info;
 			j_dbs_info = &per_cpu(cs_cpu_dbs_info, j);
 			j_dbs_info->cur_policy = policy;
+			j_dbs_info->error1 = 0;
+			j_dbs_info->error2 = 0;
+			j_dbs_info->u1 = 0;
+			j_dbs_info->u2 = 0;
 		}
 
 		dbs_enable++;
