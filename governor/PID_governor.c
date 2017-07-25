@@ -92,13 +92,13 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 	B = dbs_tuners_ins.B_value;
 	C = dbs_tuners_ins.C_value;
 	error = dbs_tuners_ins.temp_obj - temp_ac;
+	printk("error %d\n", error);
 	mutex_unlock(&dbs_mutex);
 
 	// Now the quick division (error / 1000)
 	// Hackers Delight
 	acum = error * 0x418938; // The magic number to divide by 1000
 	error = acum >> 32;
-	printk("error %d\n", error);
 
 	acum = -E * u1;
 	acum += -F * u2;
