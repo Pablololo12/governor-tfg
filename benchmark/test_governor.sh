@@ -40,12 +40,12 @@ echo -e "[\033[0;92mOK\033[0m]"
 
 
 echo -n "Changing parameters of PID"
-echo "$1" >/sys/devices/system/cpu/cpufreq/A_value
-echo "$2" >/sys/devices/system/cpu/cpufreq/B_value
-echo "$3" >/sys/devices/system/cpu/cpufreq/C_value
-echo "$4" >/sys/devices/system/cpu/cpufreq/E_value
-echo "$5" >/sys/devices/system/cpu/cpufreq/F_value
-echo "$6" >/sys/devices/system/cpu/cpufreq/temp_obj
+echo "$1" >/sys/devices/system/cpu/cpufreq/PID_GOVERNOR/A_value
+echo "$2" >/sys/devices/system/cpu/cpufreq/PID_GOVERNOR/B_value
+echo "$3" >/sys/devices/system/cpu/cpufreq/PID_GOVERNOR/C_value
+echo "$4" >/sys/devices/system/cpu/cpufreq/PID_GOVERNOR/E_value
+echo "$5" >/sys/devices/system/cpu/cpufreq/PID_GOVERNOR/F_value
+echo "$6" >/sys/devices/system/cpu/cpufreq/PID_GOVERNOR/temp_obj
 if [ "$?" -ne 0 ]; then
 	echo -e "[\033[0;31mERROR\033[0m]"
 	exit
