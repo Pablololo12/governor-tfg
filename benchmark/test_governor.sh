@@ -14,7 +14,7 @@ echo -e "\033[0;36m=============================================================
 
 exec 2>/dev/null
 
-if [ "$#" -ne 7 ]; then
+if [ "$#" -ne 6 ]; then
 	echo "Usage: A B C E F TempObj"
 	exit
 fi
@@ -40,12 +40,12 @@ echo -e "[\033[0;92mOK\033[0m]"
 
 
 echo -n "Changing parameters of PID"
-echo "$1" >/sys/devices/system/cpu/cpufreq/PID_GOVERNOR/A_value
-echo "$2" >/sys/devices/system/cpu/cpufreq/PID_GOVERNOR/B_value
-echo "$3" >/sys/devices/system/cpu/cpufreq/PID_GOVERNOR/C_value
-echo "$4" >/sys/devices/system/cpu/cpufreq/PID_GOVERNOR/E_value
-echo "$5" >/sys/devices/system/cpu/cpufreq/PID_GOVERNOR/F_value
-echo "$6" >/sys/devices/system/cpu/cpufreq/PID_GOVERNOR/temp_obj
+echo "$1" >/sys/devices/system/cpu/cpufreq/PID_governor/A_value
+echo "$2" >/sys/devices/system/cpu/cpufreq/PID_governor/B_value
+echo "$3" >/sys/devices/system/cpu/cpufreq/PID_governor/C_value
+echo "$4" >/sys/devices/system/cpu/cpufreq/PID_governor/E_value
+echo "$5" >/sys/devices/system/cpu/cpufreq/PID_governor/F_value
+echo "$6" >/sys/devices/system/cpu/cpufreq/PID_governor/temp_obj
 if [ "$?" -ne 0 ]; then
 	echo -e "[\033[0;31mERROR\033[0m]"
 	exit
