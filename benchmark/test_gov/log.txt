@@ -1,0 +1,10 @@
+Iteration: 0 time: 248.378593 Mflops: 5.404086
+Iteration: 1 time: 276.625110 Mflops: 4.852268
+Iteration: 2 time: 310.618688 Mflops: 4.321244
+Iteration: 3 time: 267.540689 Mflops: 5.017028
+Iteration: 4 time: 268.276303 Mflops: 5.003272
+Iteration: 5 time: 265.587061 Mflops: 5.053933
+Iteration: 6 time: 258.220180 Mflops: 5.198119
+Iteration: 7 time: 249.728336 Mflops: 5.374877
+Iteration: 8 time: 257.665076 Mflops: 5.209318
+Iteration: 9 time: 259.895872 Mflops: 5.164604
