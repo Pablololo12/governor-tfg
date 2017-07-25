@@ -13,6 +13,7 @@ echo -e "\033[0;36m=============================================================
 
 
 exec 2>/dev/null
+export LD_LIBRARY_PATH=/home/linaro/gcc-4.8/lib/
 
 if [ "$#" -ne 6 ]; then
 	echo "Usage: A B C E F TempObj"
