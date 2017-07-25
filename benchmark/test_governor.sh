@@ -60,7 +60,7 @@ echo "Starting test"
 ./benchmark >log.txt &
 PIDTEST="$!"
 
-while kill -0 $pid 2>/dev/null;
+while kill -0 $PIDTEST 2>/dev/null;
 do
 	sleep 5
 done
