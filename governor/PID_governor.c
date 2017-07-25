@@ -94,6 +94,12 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 	error = dbs_tuners_ins.temp_obj - temp_ac;
 	mutex_unlock(&dbs_mutex);
 
+	// Now the quick division (error / 1000)
+	// Hackers Delight
+	acum = error * 0x418938; // The magic number to divide by 1000
+	error = acum >> 32;
+	printk("error %d\n", error);
+
 	acum = -E * u1;
 	acum += -F * u2;
 	acum += A * error;
@@ -103,13 +109,13 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 	// Check for overflow
 	if ( acum <= INT_MIN ) {
 		u = INT_MIN + 1;
-		printk("Down Overflow");
+		printk("Down Overflow\n");
 	} else if ( acum >= INT_MAX ) {
 		u = INT_MAX - 1;
-		printk("Up Overflow");
+		printk("Up Overflow\n");
 	} else {
-		printk("%lld", acum);
-		u = (int) acum;
+		printk("%lld\n", acum);
+		u = acum;
 	}
 
 	printk("Error: %d Freq: %d\n", error, u);
