@@ -35,11 +35,9 @@ struct cpu_dbs_info_s {
 	int u2;
 	struct cpufreq_policy *cur_policy;
 	struct delayed_work work;
-	unsigned int requested_freq;
-	int cpu;
 	unsigned int enable:1;
 };
-static DEFINE_PER_CPU(struct cpu_dbs_info_s, cs_cpu_dbs_info);
+static struct cpu_dbs_info_s cs_cpu_dbs_info;
 
 
 /****** Global data *******/
@@ -65,7 +63,10 @@ static struct dbs_tuners {
 	.temp_obj = DEF_TEMP_OBJ,
 };
 
-static struct thermal_zone_device *tz; 
+static struct thermal_zone_device *tz0;
+static struct thermal_zone_device *tz1;
+static struct thermal_zone_device *tz2;
+static struct thermal_zone_device *tz3;
 static unsigned int dbs_enable;
 
 
@@ -96,7 +97,7 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 
 	// Now the quick division (error / 1000)
 	// Hackers Delight
-	acum = (long long int)error * 0x418938; // The magic number to divide by 1000
+	acum = (long long int) error * 0x418938; // The magic number to divide by 1000
 	error = acum >> 32;
 
 	acum = -E * u1;
@@ -145,7 +146,7 @@ static void do_dbs_timer(struct work_struct *work)
 
 	dbs_check_cpu(dbs_info);
 
-	schedule_delayed_work_on(cpu, &dbs_info->work, delay);
+	schedule_delayed_work(&dbs_info->work, delay);
 }
 
 static inline void dbs_timer_init(struct cpu_dbs_info_s *dbs_info)
@@ -156,7 +157,7 @@ static inline void dbs_timer_init(struct cpu_dbs_info_s *dbs_info)
 
 	dbs_info->enable = 1;
 	INIT_DEFERRABLE_WORK(&dbs_info->work, do_dbs_timer);
-	schedule_delayed_work_on(dbs_info->cpu, &dbs_info->work, delay);
+	schedule_delayed_work(&dbs_info->work, delay);
 }
 
 static inline void dbs_timer_exit(struct cpu_dbs_info_s *dbs_info)
@@ -327,11 +328,8 @@ static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 				   unsigned int event)
 {
 	unsigned int cpu = policy->cpu;
-	struct cpu_dbs_info_s *this_dbs_info;
 	unsigned int j;
 	int rc;
-
-	this_dbs_info = &per_cpu(cs_cpu_dbs_info, cpu);
 
 	switch (event) {
 	case CPUFREQ_GOV_START:
@@ -339,16 +337,12 @@ static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 			return -EINVAL;
 
 		mutex_lock(&dbs_mutex);
-
-		for_each_cpu(j, policy->cpus) {
-			struct cpu_dbs_info_s *j_dbs_info;
-			j_dbs_info = &per_cpu(cs_cpu_dbs_info, j);
-			j_dbs_info->cur_policy = policy;
-			j_dbs_info->error1 = 0;
-			j_dbs_info->error2 = 0;
-			j_dbs_info->u1 = 0;
-			j_dbs_info->u2 = 0;
-		}
+		
+		cs_cpu_dbs_info.cur_policy = policy;
+		cs_cpu_dbs_info.error1 = 0;
+		cs_cpu_dbs_info.error2 = 0;
+		cs_cpu_dbs_info.u1 = 0;
+		cs_cpu_dbs_info.u2 = 0;
 
 		dbs_enable++;
 		/*
@@ -366,12 +360,12 @@ static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 		}
 		mutex_unlock(&dbs_mutex);
 
-		dbs_timer_init(this_dbs_info);
+		dbs_timer_init(&cs_cpu_dbs_info);
 
 		break;
 
 	case CPUFREQ_GOV_STOP:
-		dbs_timer_exit(this_dbs_info);
+		dbs_timer_exit(&cs_cpu_dbs_info);
 
 		mutex_lock(&dbs_mutex);
 		dbs_enable--;
@@ -399,9 +393,18 @@ struct cpufreq_governor cpufreq_gov_pid = {
 
 static int __init cpufreq_gov_dbs_init(void)
 {
-	const char *name = "cpu-thermal0";
-	tz = thermal_zone_get_zone_by_name(name);
-	if (tz == NULL) return 0;
+	tz0 = thermal_zone_get_zone_by_name("cpu-thermal0");
+	if (tz0 == NULL) return 0;
+
+	tz1 = thermal_zone_get_zone_by_name("cpu-thermal1");
+	if (tz1 == NULL) return 0;
+
+	tz2 = thermal_zone_get_zone_by_name("cpu-thermal2");
+	if (tz2 == NULL) return 0;
+
+	tz3 = thermal_zone_get_zone_by_name("cpu-thermal3");
+	if (tz3 == NULL) return 0;
+
 	return cpufreq_register_governor(&cpufreq_gov_pid);
 }
 
