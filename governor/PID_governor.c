@@ -35,9 +35,10 @@ struct cpu_dbs_info_s {
 	int u2;
 	struct cpufreq_policy *cur_policy;
 	struct delayed_work work;
+	int cpu;
 	unsigned int enable:1;
 };
-static struct cpu_dbs_info_s cs_cpu_dbs_info;
+static DEFINE_PER_CPU(struct cpu_dbs_info_s, cs_cpu_dbs_info);
 
 
 /****** Global data *******/
@@ -152,7 +153,7 @@ static void do_dbs_timer(struct work_struct *work)
 
 	dbs_check_cpu(dbs_info);
 
-	schedule_delayed_work(&dbs_info->work, delay);
+	schedule_delayed_work_on(dbs_info->cpu, &dbs_info->work, delay);
 }
 
 static inline void dbs_timer_init(struct cpu_dbs_info_s *dbs_info)
@@ -163,7 +164,7 @@ static inline void dbs_timer_init(struct cpu_dbs_info_s *dbs_info)
 
 	dbs_info->enable = 1;
 	INIT_DEFERRABLE_WORK(&dbs_info->work, do_dbs_timer);
-	schedule_delayed_work(&dbs_info->work, delay);
+	schedule_delayed_work_on(dbs_info->cpu, &dbs_info->work, delay);
 }
 
 static inline void dbs_timer_exit(struct cpu_dbs_info_s *dbs_info)
@@ -334,7 +335,11 @@ static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 				   unsigned int event)
 {
 	unsigned int cpu = policy->cpu;
+	struct cpu_dbs_info_s *this_dbs_info;
+	unsigned int j;
 	int rc;
+
+	this_dbs_info = &per_cpu(cs_cpu_dbs_info, cpu);
 
 	switch (event) {
 	case CPUFREQ_GOV_START:
@@ -342,12 +347,16 @@ static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 			return -EINVAL;
 
 		mutex_lock(&dbs_mutex);
-		
-		cs_cpu_dbs_info.cur_policy = policy;
-		cs_cpu_dbs_info.error1 = 0;
-		cs_cpu_dbs_info.error2 = 0;
-		cs_cpu_dbs_info.u1 = 0;
-		cs_cpu_dbs_info.u2 = 0;
+
+		for_each_cpu(j, policy->cpus) {
+			struct cpu_dbs_info_s *j_dbs_info;
+			j_dbs_info = &per_cpu(cs_cpu_dbs_info, j);
+			j_dbs_info->cur_policy = policy;
+			j_dbs_info->error1 = 0;
+			j_dbs_info->error2 = 0;
+			j_dbs_info->u1 = 0;
+			j_dbs_info->u2 = 0;
+		}
 
 		dbs_enable++;
 		/*
@@ -365,12 +374,12 @@ static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 		}
 		mutex_unlock(&dbs_mutex);
 
-		dbs_timer_init(&cs_cpu_dbs_info);
+		dbs_timer_init(this_dbs_info);
 
 		break;
 
 	case CPUFREQ_GOV_STOP:
-		dbs_timer_exit(&cs_cpu_dbs_info);
+		dbs_timer_exit(this_dbs_info);
 
 		mutex_lock(&dbs_mutex);
 		dbs_enable--;
