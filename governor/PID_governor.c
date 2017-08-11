@@ -74,12 +74,19 @@ static unsigned int dbs_enable;
 static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 {
 	int E, F, A, B, C, error, u, e1, e2, u1, u2, temp_ac;
+	int t0, t1, t2, t3;
 	long long int acum;
 	struct cpufreq_policy *policy;
 
 	policy = this_dbs_info->cur_policy;
 	
-	thermal_zone_get_temp(tz, &temp_ac);
+	thermal_zone_get_temp(tz0, &t0);
+	thermal_zone_get_temp(tz1, &t1);
+	thermal_zone_get_temp(tz2, &t2);
+	thermal_zone_get_temp(tz3, &t3);
+
+	temp_ac = t0 + t1 + t2 + t3;
+	temp_ac = temp_ac >> 2;
 
 	e1 = this_dbs_info->error1;
 	e2 = this_dbs_info->error2;
