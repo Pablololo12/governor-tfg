@@ -142,7 +142,6 @@ static void do_dbs_timer(struct work_struct *work)
 	int delay;
 	struct cpu_dbs_info_s *dbs_info =
 		container_of(work, struct cpu_dbs_info_s, work.work);
-	unsigned int cpu = dbs_info->cpu;
 
 	/* We want all CPUs to do sampling nearly on same jiffy */
 	mutex_lock(&dbs_mutex);
@@ -335,7 +334,6 @@ static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 				   unsigned int event)
 {
 	unsigned int cpu = policy->cpu;
-	unsigned int j;
 	int rc;
 
 	switch (event) {
