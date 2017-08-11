@@ -21,8 +21,10 @@ if [ "$#" -eq 1 ]; then
 fi
 
 if [ "$#" -ne 6 ]; then
-	echo "Usage: A B C E F TempObj"
-	exit
+	if [ notchange = 0 ]; then
+		echo "Usage: A B C E F TempObj"
+		exit
+	fi
 fi
 
 echo -n "Shutting down cores..."
