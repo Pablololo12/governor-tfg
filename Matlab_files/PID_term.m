@@ -1,6 +1,6 @@
 clear all
 
-Ti = 180.0;
+Ti = 90.0;
 Td = 0.0;
 K = 100000;
 alfa = 1.0; %% Entre 0 y 1
