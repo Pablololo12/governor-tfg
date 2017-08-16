@@ -4,7 +4,7 @@ pabloheralm@gmail.com
 
 Un governor para linux basado en un controlador PID para mantener una temperatura constante.
 
-A governor for linux based on a PID controler to keep a constant temperature.
+A linux governor based on a PID controler to keep a constant temperature.
 
 ## Ficheros
 
