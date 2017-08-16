@@ -8,7 +8,7 @@ if len(sys.argv) != 3:
 	sys.exit(0)
 
 
-font = {'family' : 'normal',
+font = {'family' : 'Bitstream Vera Sans',
         'weight' : 'bold',
         'size'   : 18}
 
@@ -96,6 +96,5 @@ plt.xticks(y_pos,iter_values)
 plt.ylabel('Mflops')
 plt.xlabel('Iteracion')
 plt.xlim([-1,len(iter_values)])
-plt.tight_layout()
 
 plt.show()

@@ -70,6 +70,19 @@ static struct thermal_zone_device *tz2;
 static struct thermal_zone_device *tz3;
 static unsigned int dbs_enable;
 
+int long_int_to_int(long long int big)
+{
+	int u;
+	// Check for overflow
+	if (big <= INT_MIN) {
+		u = INT_MIN + 1;
+	} else if (big >= INT_MAX) {
+		u = INT_MAX - 1;
+	} else {
+		u = big;
+	}
+	return u;
+}
 
 /********************* PID controler *********************/
 static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
@@ -85,7 +98,7 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 	thermal_zone_get_temp(tz1, &t1);
 	thermal_zone_get_temp(tz2, &t2);
 	thermal_zone_get_temp(tz3, &t3);
-
+	// Calculate the media
 	temp_ac = t0 + t1 + t2 + t3;
 	temp_ac = temp_ac >> 2;
 
@@ -105,7 +118,8 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 
 	// Now the quick division (error / 1000)
 	// Hackers Delight
-	acum = (long long int) error * 0x418938; // The magic number to divide by 1000
+	// The magic number to divide by 1000
+	acum = (long long int) error * 0x418938;
 	error = acum >> 32;
 
 	acum = -E * u1;
@@ -114,17 +128,7 @@ static void dbs_check_cpu(struct cpu_dbs_info_s *this_dbs_info)
 	acum += B * e1;
 	acum += C * e2;
 
-	// Check for overflow
-	if ( acum <= INT_MIN ) {
-		u = INT_MIN + 1;
-		printk("Down Overflow\n");
-	} else if ( acum >= INT_MAX ) {
-		u = INT_MAX - 1;
-		printk("Up Overflow\n");
-	} else {
-		printk("%lld\n", acum);
-		u = acum;
-	}
+	u = long_int_to_int(acum);
 
 	printk("Error: %d Freq: %d\n", error, u);
 
@@ -388,7 +392,7 @@ static int cpufreq_governor_dbs(struct cpufreq_policy *policy,
 		mutex_unlock(&dbs_mutex);
 		if (!dbs_enable)
 			sysfs_remove_group(cpufreq_global_kobject,
-					   &dbs_attr_group);
+					&dbs_attr_group);
 
 		break;
 	}
@@ -408,16 +412,16 @@ struct cpufreq_governor cpufreq_gov_pid = {
 static int __init cpufreq_gov_dbs_init(void)
 {
 	tz0 = thermal_zone_get_zone_by_name("cpu-thermal0");
-	if (tz0 == NULL) return 0;
+	if (tz0 == NULL) return EFAULT;
 
 	tz1 = thermal_zone_get_zone_by_name("cpu-thermal1");
-	if (tz1 == NULL) return 0;
+	if (tz1 == NULL) return EFAULT;
 
 	tz2 = thermal_zone_get_zone_by_name("cpu-thermal2");
-	if (tz2 == NULL) return 0;
+	if (tz2 == NULL) return EFAULT;
 
 	tz3 = thermal_zone_get_zone_by_name("cpu-thermal3");
-	if (tz3 == NULL) return 0;
+	if (tz3 == NULL) return EFAULT;
 
 	return cpufreq_register_governor(&cpufreq_gov_pid);
 }

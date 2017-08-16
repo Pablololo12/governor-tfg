@@ -14,7 +14,7 @@ if len(sys.argv) != 7:
 # ruta guardado
 # extension del nombre
 
-font = {'family' : 'normal',
+font = {'family' : 'Bitstream Vera Sans',
         'weight' : 'bold',
         'size'   : 18}
 
