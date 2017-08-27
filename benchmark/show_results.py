@@ -11,7 +11,7 @@ if len(sys.argv) != 3:
 
 font = {'family' : 'Bitstream Vera Sans',
         'weight' : 'bold',
-        'size'   : 18}
+        'size'   : 24}
 
 plt.rc('font', **font)
 plt.rc('lines', linewidth=4)
@@ -54,16 +54,20 @@ def f_freq(x):
 	return freq_values[x]
 
 plt.figure(1)
-plt.title('Freq')
+#plt.title('Freq')
 plt.xlabel('Tiempo')
 plt.plot(x,f_freq(x),'b')
 plt.ylabel('Freq Real (MHz)', color='b')
+plt.xlim([0,size_temp])
+plt.ylim([600, 1800])
 
 plt.figure(2)
-plt.title('Temp')
+#plt.title('Temp')
 plt.xlabel('Tiempo')
 plt.plot(x,f_temp(x),'b')
 plt.ylabel('Temp', color='b')
+plt.xlim([0,size_temp])
+plt.ylim([45, 100])
 
 
 # Now plot the mflops
@@ -72,8 +76,9 @@ plt.ylabel('Temp', color='b')
 iter_values = [0] * 10
 time_values = [0] * 10
 flops_values_max = [0.0] * 10
-
 flops_values_min = [20.0] * 10
+flops_values_media = [0.0] * 10
+number_results = 0
 
 #file_stats = open(sys.argv[2], 'r')
 for file in os.listdir(sys.argv[2]):
@@ -84,16 +89,21 @@ for file in os.listdir(sys.argv[2]):
 		result_lines = file_stats.readlines()
 		# Extract numbers from the file
 		i=0
+		number_results = number_results + 1
 		for line in result_lines:
 			aux = re.findall(r'\d+[\.]?\d*', line)
 			iter_values[i] = int(aux[0])
 			time_values[i] = float(aux[1])
 			tt = float(aux[2])
+			flops_values_media[i] = flops_values_media[i] + tt
 			if tt > flops_values_max[i]:
 				flops_values_max[i] = tt
 			if tt < flops_values_min[i]:
 				flops_values_min[i] = tt
 			i = i + 1
+
+for d in range(0,len(flops_values_media)):
+	flops_values_media[d] = flops_values_media[d] / number_results
 
 iter_values = np.array(iter_values)
 time_values = np.array(time_values)
@@ -103,12 +113,14 @@ flops_values_min = np.array(flops_values_min)
 y_pos = np.arange(len(iter_values))
 
 plt.figure(4)
-plt.title('Resultados Benchmark (Mflops)')
+#plt.title('Resultados Benchmark (Mflops)')
 plt.bar(y_pos, flops_values_max, align='center', color='blue', alpha=0.5)
+plt.bar(y_pos, flops_values_media, align='center', color='yellow', alpha=0.5)
 plt.bar(y_pos, flops_values_min, align='center', color='red', alpha=0.5)
 plt.xticks(y_pos,iter_values)
 plt.ylabel('Mflops')
 plt.xlabel('Iteracion')
 plt.xlim([-1,len(iter_values)])
+plt.ylim([0,8])
 
 plt.show()
