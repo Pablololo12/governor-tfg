@@ -103,7 +103,8 @@ plt.xlabel('Tiempo')
 plt.plot(x,f_thu(x),'b')
 plt.ylabel('Freq Real (MHz)', color='b')
 plt.plot(x,f_freq(x),'g')
-plt.xlim([0,size_temp])
+plt.xlim([0,500])
+plt.ylim([500, 1800])
 plt.tight_layout()
 
 plt.savefig(sys.argv[5]+"/freq_"+sys.argv[6]+".pdf", format="pdf")
@@ -115,7 +116,8 @@ plt.plot([0, size_temp], [sys.argv[4], sys.argv[4]], '--')
 plt.plot(x,f_temp(x),'r')
 plt.xlabel('Tiempo')
 plt.ylabel('Temp (C)')
-plt.xlim([0,size_temp])
+plt.xlim([0,500])
+plt.ylim([45, 100])
 plt.tight_layout()
 plt.savefig(sys.argv[5]+"/temp_"+sys.argv[6]+".pdf", format="pdf")
 
@@ -128,20 +130,7 @@ plt.ylabel('Temp (C)')
 plt.xlim([0,size_error])
 plt.tight_layout()
 plt.savefig(sys.argv[5]+"/error_"+sys.argv[6]+".pdf", format="pdf")
-'''
-# Show Temperature and frequency in the same plot
-fig2, ax3= plt.subplots()
-plt.title('Error-Frecuencia continua')
-ax3.set_xlabel('Time')
-ax3.plot(x,f_error(x),'b')
-ax3.set_ylabel('Diff Temp (C)', color='b')
 
-ax4 = ax3.twinx()
-ax4.plot(x,f_thu(x),'g')
-ax4.set_ylabel('Freq (MHz)', color='g')
-
-fig2.tight_layout()
-'''
 
 # Now plot the results
 file_stats = open(sys.argv[3], 'r')
@@ -166,14 +155,7 @@ time_values = np.array(time_values)
 flops_values = np.array(flops_values)
 
 y_pos = np.arange(len(iter_values))
-'''
-plt.figure(4)
-plt.title('Benchmarck results (time)')
-plt.bar(y_pos, time_values, align='center', alpha=0.5)
-plt.xticks(y_pos,iter_values)
-plt.ylabel('Time spent (seconds)')
-plt.xlabel('Iteration')
-'''
+
 plt.figure(4)
 plt.title('Resultados Benchmark (Mflops)')
 plt.bar(y_pos, flops_values, align='center', alpha=0.5)

@@ -16,7 +16,7 @@ exec 2>/dev/null
 export LD_LIBRARY_PATH=/home/linaro/gcc-4.8/lib/
 notchange=0
 
-if [ "$#" -eq 1 ]; then
+if [ "$#" -eq 0 ]; then
 	notchange=1
 fi
 
