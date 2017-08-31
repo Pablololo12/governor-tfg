@@ -100,6 +100,8 @@ for file in os.listdir(sys.argv[2]):
 			iter_values[i] = int(aux[0])
 			time_values[d][i] = float(aux[1])
 			tt = float(aux[2])
+			tt = 1099444518912/time_values[d][i];
+			tt = tt / 1000000000
 			flops_values_media[i] = flops_values_media[i] + tt
 			if tt > flops_values_max[i]:
 				flops_values_max[i] = tt
@@ -116,18 +118,20 @@ time_values = np.array(time_values)
 flops_values_max = np.array(flops_values_max)
 flops_values_min = np.array(flops_values_min)
 
+print flops_values_max.mean()
+
 y_pos = np.arange(len(iter_values))
 
 plt.figure(3)
-#plt.title('Resultados Benchmark (Mflops)')
+#plt.title('Resultados Benchmark (Gflops)')
 plt.bar(y_pos, flops_values_max, align='center', color='blue', alpha=0.5)
 plt.bar(y_pos, flops_values_media, align='center', color='yellow', alpha=0.5)
 plt.bar(y_pos, flops_values_min, align='center', color='red', alpha=0.5)
 plt.xticks(y_pos,iter_values)
-plt.ylabel('Mflops')
+plt.ylabel('Gflops')
 plt.xlabel('Iteracion')
 plt.xlim([-1,len(iter_values)])
-plt.ylim([0,8])
+plt.ylim([0,7])
 plt.tight_layout()
 plt.savefig("bench_"+sys.argv[3]+".pdf", format="pdf")
 

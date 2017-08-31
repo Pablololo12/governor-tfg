@@ -32,6 +32,9 @@ for file in os.listdir(sys.argv[1]):
 			aux = re.findall(r'\d+[\.]?\d*', line)
 			iter_values_1[i] = int(aux[0])
 			tt = float(aux[2])
+			time = float(aux[1])
+			tt = 1099444518912/time;
+			tt = tt / 1000000000
 			flops_values_media_1[i] = flops_values_media_1[i] + tt
 			if tt > flops_values_max_1[i]:
 				flops_values_max_1[i] = tt
@@ -60,6 +63,9 @@ for file in os.listdir(sys.argv[2]):
 		for line in result_lines:
 			aux = re.findall(r'\d+[\.]?\d*', line)
 			tt = float(aux[2])
+			time = float(aux[1])
+			tt = 1099444518912/time;
+			tt = tt / 1000000000
 			flops_values_media_2[i] = flops_values_media_2[i] + tt
 			if tt > flops_values_max_2[i]:
 				flops_values_max_2[i] = tt
@@ -84,19 +90,19 @@ plt.figure(1)
 #plt.title('Resultados Benchmark (Mflops)')
 w = 0.20
 w2 = 0.4
-plt.bar(y_pos-w, flops_values_max_1, width=w2, align='center', color='c', alpha=0.5)
-plt.bar(y_pos-w, flops_values_media_1, width=w2, align='center', color='g', alpha=0.5)
-plt.bar(y_pos-w, flops_values_min_1, width=w2, align='center', color='b', alpha=0.5, label="PID")
+plt.bar(y_pos-w, flops_values_max_1, width=w2, align='center', color='c', alpha=0.5, label="PID max")
+plt.bar(y_pos-w, flops_values_media_1, width=w2, align='center', color='g', alpha=0.5, label="PID media")
+plt.bar(y_pos-w, flops_values_min_1, width=w2, align='center', color='b', alpha=0.5, label="PID min")
 
-plt.bar(y_pos+w, flops_values_max_2, width=w2, align='center', color='m', alpha=0.5)
-plt.bar(y_pos+w, flops_values_media_2, width=w2, align='center', color='yellow', alpha=0.5)
-plt.bar(y_pos+w, flops_values_min_2, width=w2, align='center', color='red', alpha=0.5, label="Defecto")
-plt.legend()
+plt.bar(y_pos+w, flops_values_max_2, width=w2, align='center', color='m', alpha=0.5, label="Defecto max")
+plt.bar(y_pos+w, flops_values_media_2, width=w2, align='center', color='yellow', alpha=0.5, label="Defecto media")
+plt.bar(y_pos+w, flops_values_min_2, width=w2, align='center', color='red', alpha=0.5, label="Defecto min")
+plt.legend(prop={'size': 14}, loc=3)
 plt.xticks(y_pos,iter_values_1)
 plt.ylabel('Mflops')
 plt.xlabel('Iteracion')
 plt.xlim([-1,len(iter_values_1)])
-plt.ylim([0,8])
+plt.ylim([0,7])
 plt.tight_layout()
 plt.savefig(sys.argv[3]+".pdf", format="pdf")
-#plt.show()
+plt.show()
