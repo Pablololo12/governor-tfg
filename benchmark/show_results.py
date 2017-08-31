@@ -135,8 +135,18 @@ plt.ylim([0,7])
 plt.tight_layout()
 plt.savefig("bench_"+sys.argv[3]+".pdf", format="pdf")
 
-desv_tip = np.std(time_values, 0)
-media = time_values.mean(axis=0)
+desv_tip = np.std(time_values)
+media = time_values.mean()
+print desv_tip
+print media
+print desv_tip / media
+
+# remove outliers (first and last elements)
+
+array_ordenado = sorted(time_values.flatten())[1:-1]
+desv_tip = np.std(array_ordenado)
+media = np.mean(array_ordenado)
+print "------"
 print desv_tip
 print media
 print desv_tip / media
