@@ -2,9 +2,37 @@
 # Pablo Hernández Almudi
 pabloheralm@gmail.com
 
-Un governor para linux basado en un controlador PID para mantener una temperatura constante.
+## Description
 
-A linux governor based on a PID controler to keep a constant temperature.
+A Linux governor based on a PID controller which keeps a constant temperature
+under a constant load.
+
+## Files
+
+* benchmark/ - Folder with the benchmark and scripts
+    - main.c benchmark main file
+    - Makefile for the benchmark
+    - heater.sh script for automatic test with the userspace governor
+    - test_governor.sh script for automatic test of PID governor
+    - plot_results.py, show_results.py and compare.py Python scripts to plot graphics
+    - tempLog.sh script to log temperature and frequency
+* Matlab_files/ - Folder with diferent Matlab scripts
+* PID_controler/ - Folder with the PID controller on userspace
+    - user_governor.c main file of the controller
+    - Makefile for the controller
+    - pid.c and pid.h the controller as a library
+    - graph_lib/ a library to show graphics on the terminal
+* governor/ - Folder with the governor source
+    - PID_governor.c the source code
+    - kernel_compile.md instructions to add the governor to the kernel
+* results/ - Folder with results
+
+---
+
+## Descripción
+
+Un governor para linux basado en un controlador PID que mantiene una temperatura
+constante bajo una carga constante.
 
 ## Ficheros
 
@@ -16,8 +44,6 @@ A linux governor based on a PID controler to keep a constant temperature.
     - heater.sh script para probar PID de usuario
     - test_governor.sh script para probar el governor
     - tempLog.sh script para guardar información sobre frecuencia y temperatura
-    - test_gov/ resultados de test con el governor
-    - tests/ y tests2/ resultads de pruebas con PID usuario
 * results/ - Carpeta con los resultados del calentamiento
 * governor/ - carpeta con fuentes del governor
   * PID_governor.c - fichero principal del governor
