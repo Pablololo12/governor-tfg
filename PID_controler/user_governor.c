@@ -99,6 +99,8 @@ int main(void)
 		return 1;
 	}
 
+	int period = get_period();
+
 	while (1) {
 		// Get the current temperature
 		pread(temp,temp_buff,8, 0);
@@ -135,7 +137,7 @@ int main(void)
 			pwrite(cpus_fd[i], freq_str, strlen(freq_str),0);
 		}
 
-		sleep(3);
+		usleep(period);
 	}
 
 	return 0;

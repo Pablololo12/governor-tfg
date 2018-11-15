@@ -14,4 +14,6 @@ int update_temp(float error);
 // initialize the constants for the formula
 int initialize_pid(void);
 
+int get_period();
+
 #endif

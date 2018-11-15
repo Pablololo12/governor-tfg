@@ -12,6 +12,7 @@ static float F = 0;
 static float A = 918+10000/25000; // K = (fmax - f0) / error_maximo
 static float B = 0;
 static float C = 0;
+static int Period = 1000000;
 
 static FILE *fp_log;
 
@@ -64,6 +65,11 @@ int update_temp(float error)
 	return which_freq(u);
 }
 
+int get_period()
+{
+	return Period;
+}
+
 /*
  * Initialize variables for PID and frequencies
  */
@@ -80,7 +86,7 @@ int initialize_pid()
 		return -1;
 	}
 
-	fscanf(fp_const, "%f %f %f %f %f", &E, &F, &A, &B, &C);
+	fscanf(fp_const, "%f %f %f %f %f %d", &E, &F, &A, &B, &C, &Period);
 
 	fclose(fp_const);
 
