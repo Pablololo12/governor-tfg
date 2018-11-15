@@ -16,4 +16,6 @@ int initialize_pid(void);
 
 int get_period();
 
+int get_desired_temp();
+
 #endif

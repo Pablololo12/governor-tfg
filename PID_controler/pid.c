@@ -13,6 +13,7 @@ static float A = 918+10000/25000; // K = (fmax - f0) / error_maximo
 static float B = 0;
 static float C = 0;
 static int Period = 1000000;
+static int desiredTemp = 75000;
 
 static FILE *fp_log;
 
@@ -70,6 +71,11 @@ int get_period()
 	return Period;
 }
 
+int get_desired_temp()
+{
+	return desiredTemp;
+}
+
 /*
  * Initialize variables for PID and frequencies
  */
@@ -86,7 +92,7 @@ int initialize_pid()
 		return -1;
 	}
 
-	fscanf(fp_const, "%f %f %f %f %f %d", &E, &F, &A, &B, &C, &Period);
+	fscanf(fp_const, "%f %f %f %f %f %d %d", &E, &F, &A, &B, &C, &Period, &desiredTemp);
 
 	fclose(fp_const);
 

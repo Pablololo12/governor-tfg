@@ -100,6 +100,7 @@ int main(void)
 	}
 
 	int period = get_period();
+	int desiredTemp = get_desired_temp();
 
 	while (1) {
 		// Get the current temperature
@@ -122,7 +123,7 @@ int main(void)
 		print_graph(temp_historic, number_elements);
 
 		// Update the PID
-		new_freq = update_temp((DESIRED_TEMP-aux)/1000.0);
+		new_freq = update_temp((desiredTemp-aux)/1000.0);
 
 		fprintf(gob_log, "%d %d\n", aux, new_freq);
 		++flush;
